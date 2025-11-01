@@ -1,6 +1,6 @@
 #include "Battlefield_Tile.h"
 
-Battlefield_Tile::Battlefield_Tile( const Tile tile, const Team team ) : _tile(tile)
+Battlefield_Tile::Battlefield_Tile( const Tile tile, const Team team ) : m_tile(tile)
 {
       update_symbol(team);
 }
@@ -20,26 +20,26 @@ void Battlefield_Tile::update_symbol(const Team team, const char ch)
 {
       switch( get_tile() )
       {
-            case Tile::Normal        : _symbol = '_'; _team = Team::Neutral; break;
-            case Tile::Unreachable   : _symbol = 'X'; _team = Team::Neutral; break;
-            case Tile::Tower         : _symbol = 'T'; _team = team;          break;
-            case Tile::Wall          : _symbol = 'W'; _team = team;          break;
-            case Tile::Fortification : _symbol = 'F'; _team = team;          break;
-            case Tile::Obstacle      : _symbol = 'O'; _team = Team::Neutral; break;
-            case Tile::Land_Mine     : _symbol = 'M'; _team = team;          break;
-            case Tile::Quicksand     : _symbol = 'Q'; _team = team;          break;
-            case Tile::Army          : _symbol =  ch; _team = team;          break;
+            case Tile::Normal        : m_symbol = '_'; m_team = Team::Neutral; break;
+            case Tile::Unreachable   : m_symbol = 'X'; m_team = Team::Neutral; break;
+            case Tile::Tower         : m_symbol = 'T'; m_team = team;          break;
+            case Tile::Wall          : m_symbol = 'W'; m_team = team;          break;
+            case Tile::Fortification : m_symbol = 'F'; m_team = team;          break;
+            case Tile::Obstacle      : m_symbol = 'O'; m_team = Team::Neutral; break;
+            case Tile::Land_Mine     : m_symbol = 'M'; m_team = team;          break;
+            case Tile::Quicksand     : m_symbol = 'Q'; m_team = team;          break;
+            case Tile::Army          : m_symbol =  ch; m_team = team;          break;
       }
 }
 
 void Battlefield_Tile::setup_tile(const Tile tile, const Team team, const char ch)
 {
-      _tile = tile;
+      m_tile = tile;
       update_symbol(team, ch);
 }
 
 void Battlefield_Tile::reset_tile()
 {
-      _tile = Tile::Normal;
+      m_tile = Tile::Normal;
       update_symbol();
 }

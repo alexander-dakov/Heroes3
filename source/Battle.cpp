@@ -1,6 +1,39 @@
+#include <thread>
+#define NOMINMAX
+#include <algorithm>
+#include <cstdint>
+#include <string>
+
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 #include "Battle.h"
 
-Battle::Battle( Hero& attacker, Hero& defender, const Format format, const Terrain terrain ) : _attacker(attacker), _defender(defender), _format(format), _terrain(terrain)
+namespace 
+{
+      const uint16_t RANDOM_LIMIT = 1000;
+
+      const uint8_t PROBABILITY_TERRIBLE = 250;
+      const uint8_t PROBABILITY_AWFUL    = 167;
+      const uint8_t PROBABILITY_BAD      =  83;
+      const uint8_t PROBABILITY_NEUTRAL  =   0;
+      const uint8_t PROBABILITY_GOOD     =  42;
+      const uint8_t PROBABILITY_GREAT    =  83;
+      const uint8_t PROBABILITY_SUPERB   = 125;
+
+      const float PERCENT_0   = 0.00f;
+      const float PERCENT_5   = 0.05f;
+      const float PERCENT_10  = 0.10f;
+      const float PERCENT_15  = 0.15f;
+      const float PERCENT_20  = 0.20f;
+      const float PERCENT_25  = 0.25f;
+      const float PERCENT_30  = 0.30f;
+      const float PERCENT_50  = 0.50f;
+      const float PERCENT_100 = 1.00f;
+}
+
+Battle::Battle( Hero& attacker, Hero& defender, const Format format, const Terrain terrain ) : m_attacker(attacker), m_defender(defender), m_format(format), m_terrain(terrain)
 {
       if( get_attacker()->get_team() == get_defender()->get_team() )
       {
@@ -19,10 +52,10 @@ Battle::Battle( Hero& attacker, Hero& defender, const Format format, const Terra
       else
             for( uint8_t i = 0; i < Hero_slots::ARMY; i++ )
             {
-                  if( _attacker.get_army_stack(i) != nullptr )
-                        apply_terrain_bonuses_to_stack( _attacker.get_army_stack(i) );
-                  if( _defender.get_army_stack(i) != nullptr )
-                        apply_terrain_bonuses_to_stack( _defender.get_army_stack(i) );
+                  if( m_attacker.get_army_stack(i) != nullptr )
+                        apply_terrain_bonuses_to_stack( m_attacker.get_army_stack(i) );
+                  if( m_defender.get_army_stack(i) != nullptr )
+                        apply_terrain_bonuses_to_stack( m_defender.get_army_stack(i) );
             }
 
       // After the battlefield is set and all initial bonuses are given accordingly, create the turn order.
@@ -34,14 +67,14 @@ Battle::Battle( Hero& attacker, Hero& defender, const Format format, const Terra
       // All the preparations are done - time to start the battle
       { // formatted like this for ease of reading
             printf( "\nA battle between " );
-            print_colored_string( _attacker.get_name().c_str(), _attacker.get_team() );
+            print_colored_string( m_attacker.get_name().c_str(), m_attacker.get_team() );
             printf( " and " );
-            print_colored_string( _defender.get_name().c_str(), _defender.get_team() );
+            print_colored_string( m_defender.get_name().c_str(), m_defender.get_team() );
             printf( " has begun!\n" );
       }
 
       // Start the battle
-      while( !check_battle_finished()  )
+      while( !check_battle_finished() )
       {
             // Updates stacks' action, buffs/debuffs and reset the turn order accordingly.
             set_up_next_round();
@@ -120,75 +153,69 @@ Battle::~Battle()
       printf( "The battle has ended!\n" );
 }
 
-bool Battle::get_has_angel_ally(Stack* const stack)
+Stack* Battle::find_present_stack( const bool other_stack_is_on_battlefield, Stack* const my_stack, const bool stacks_are_allies )
 {
-      if( get_angel_present() )
+      if( other_stack_is_on_battlefield )
             for( uint8_t i = 0; i < get_turns()->size(); i++ )
             {
                   auto const s = get_stack_turn(i);
-                  if( s->get_team() == stack->get_team() && !s->get_has_perished() )
-                        if( s->get_creature()->get_increases_alias_morale_1() ) // Angel & Archangel
-                              return true;
+                  bool same_team = s->get_team() == my_stack->get_team();
+                  if( stacks_are_allies == same_team && !s->get_has_perished() )
+                        return s;
             }
 
-      return false;
+      return nullptr;
 }
 
-bool Battle::get_has_necro_dragon_enemy(Stack* const stack)
+bool Battle::get_ally_has_angel(Stack* const stack)
 {
-      if( get_necro_dragon_present() )
-            for( uint8_t i = 0; i < get_turns()->size(); i++ )
-            {
-                  auto const s = get_stack_turn(i);
-                  if( s->get_team() != stack->get_team() && !s->get_has_perished() )
-                        if( s->get_creature()->get_decreases_enemy_morale_1() ) // Bone Dragon & Ghost Dragon
-                              return true;
-            }
-
-      return false;
+      Stack* const s = find_present_stack(get_angel_present(), stack, true);
+      
+      if(!s) return false;
+      
+      return s->get_creature()->get_increases_alias_morale_by_1(); // true for Angel & Archangel
 }
 
-bool Battle::get_has_devil_enemy(Stack* const stack)
+bool Battle::get_enemy_has_necro_dragon(Stack* const stack)
 {
-      if( get_devil_present() )
-            for( uint8_t i = 0; i < get_turns()->size(); i++ )
-            {
-                  auto const s = get_stack_turn(i);
-                  if( s->get_team() != stack->get_team() && !s->get_has_perished() )
-                        if( s->get_creature()->get_decreases_enemy_luck_1() ) // Devil
-                              return true;
-            }
-      return false;
+      Stack* const s = find_present_stack(get_necro_dragon_present(), stack, false);
+      
+      if(!s) return false;
+      
+      return s->get_creature()->get_decreases_enemy_morale_by_1(); // true for Bone Dragon & Ghost Dragon
 }
 
-bool Battle::get_has_archdevil_enemy(Stack* const stack)
+bool Battle::get_enemy_has_devil(Stack* const stack)
 {
-      if( get_archdevil_present() )
-            for( uint8_t i = 0; i < get_turns()->size(); i++ )
-            {
-                  auto const s = get_stack_turn(i);
-                  if( s->get_team() != stack->get_team() && !s->get_has_perished() )
-                        if( s->get_creature()->get_decreases_enemy_luck_2() ) // Archdevil
-                              return true;
-            }
-
-      return false;
+      Stack* const s = find_present_stack(get_devil_present(), stack, false);
+      
+      if(!s) return false;
+      
+      return s->get_creature()->get_decreases_enemy_luck_by_1(); // true for Devil
 }
 
-bool Battle::get_has_leprechaun_ally(Stack* const stack)
+bool Battle::get_enemy_has_archdevil(Stack* const stack)
 {
-      if( get_leprechaun_present() )
-            for( uint8_t i = 0; i < get_turns()->size(); i++ )
-                  if( get_stack_turn(i)->get_creature()->get_doubles_luck_chance() && get_stack_turn(i)->get_team() == stack->get_team() )
-                        return true;
+      Stack* const s = find_present_stack(get_archdevil_present(), stack, false);
+      
+      if(!s) return false;
+      
+      return s->get_creature()->get_decreases_enemy_luck_by_2(); // true for Archdevil
+}
 
-      return false;
+bool Battle::get_ally_has_leprechaun(Stack* const stack)
+{
+      Stack* const s = find_present_stack(get_leprechaun_present(), stack, true);
+      
+      if(!s) return false;
+
+      return s->get_creature()->get_doubles_luck_chance(); // true for Leprechaun
 }
 
 Position Battle::enter_battlefield_coordinates()
 {
       uint16_t x, y; // uint16_t instead of uint8_t, because otherwise it gets read as char (ascii code)
-
+      
       while ( ( printf("\nx = ") ) && ( !( std::cin >> x ) || x < 0 || x > Battlefield::LENGTH - 1) )
       {
             printf("\nCoordinate 'x' must be in the range [0;%d]!", Battlefield::LENGTH - 1);
@@ -345,13 +372,15 @@ void Battle::set_up_battlefield()
 
 void Battle::print_battlefield(Stack* const current_stack)
 {
-      printf("\n========================================");
-      printf("\n________________________________________\n");
-      printf(  "|                                      |\n");
+      printf("\n================================================");
+      printf("\n         0 1 2 3 4 5 6 7 8 9 10  12  14\n");
+      printf("    ________________________________________\n");
+      printf("    |                                      |\n");
 
       for( uint8_t i = 0; i < Battlefield::WIDTH; i++ )
       {
-            printf("|    ");
+            if( i < 10 ) { printf("  %d |    ", i); }
+            else         { printf( " %d |    ", i); }
             for( uint8_t j = 0; j < Battlefield::LENGTH; j++ )
             {
                   if( tile_is_reachable(j, i, current_stack) ) // ensure the tile is free and is within stack's reach
@@ -360,14 +389,14 @@ void Battle::print_battlefield(Stack* const current_stack)
                         print_colored_string( battlefield[i][j].get_symbol(), battlefield[i][j].get_team() );
                   printf(" ");
             }
-            printf("    |\n");
+            printf("    | %d\n", i);
       }
-      printf("|                                      |\n");
-      printf("|______________________________________|\n");
-      printf("\n");
+      printf("    |                                      |\n");
+      printf("    |______________________________________|\n");
+      printf("\n         0 1 2 3 4 5 6 7 8 9 10  12  14\n");
 
 
-      printf( "The army led by ");
+      printf( "\nThe army led by ");
       print_colored_string( get_attacker()->get_name().c_str(), get_attacker()->get_team() );
       printf( " :\n");
       for( uint8_t i = 0; i < Hero_slots::ARMY; i++)
@@ -380,9 +409,7 @@ void Battle::print_battlefield(Stack* const current_stack)
                   }
       }
 
-      printf("\n");
-
-      printf( "The army led by ");
+      printf( "\nThe army led by ");
       print_colored_string( get_defender()->get_name().c_str(), get_defender()->get_team() );
       printf( " :\n");
       for( uint8_t i = 0; i < Hero_slots::ARMY; i++)
@@ -395,7 +422,7 @@ void Battle::print_battlefield(Stack* const current_stack)
                   }
       }
 
-      printf("\n========================================\n");
+      printf("\n================================================\n");
 }
 
 void Battle::apply_terrain_bonuses_to_stack(Stack* stack)
@@ -439,7 +466,7 @@ void Battle::apply_terrain_bonuses_to_stack(Stack* stack)
 
 void Battle::set_up_next_round()
 {
-      _round += 1;
+      m_round += 1;
 
       new_turn();
 
@@ -462,10 +489,10 @@ void Battle::set_up_initial_turns()
       // Fill the vector of normal turns
       for( uint8_t i = 0; i < Hero_slots::ARMY; i++ )
       {
-            if( _attacker.get_army_stack(i) != nullptr )
-                  turns->emplace_back( _attacker.get_army_stack(i) );
-            if( _defender.get_army_stack(i) != nullptr )
-                  turns->emplace_back( _defender.get_army_stack(i) );
+            if( m_attacker.get_army_stack(i) != nullptr )
+                  turns->emplace_back( m_attacker.get_army_stack(i) );
+            if( m_defender.get_army_stack(i) != nullptr )
+                  turns->emplace_back( m_defender.get_army_stack(i) );
       }
 
       set_up_normal_turns();
@@ -475,8 +502,9 @@ void Battle::set_up_normal_turns()
 {
       auto turns = get_turns();
 
+      auto attacker_team = get_attacker()->get_team();
       // order the turns of the stacks according to their speed - from fast to slow, and if the speeds match, then the attcker gets to move first
-      auto compare_speeds = [&](Stack* a, Stack* b){ return ( a->get_speed() > b->get_speed() ) + ( a->get_speed() == b->get_speed() )*( a->get_team() == get_attacker()->get_team() ); }; // lambda function to use in the sort
+      auto compare_speeds = [&](Stack* a, Stack* b) -> bool { return ( a->get_speed() > b->get_speed() ) || ( ( a->get_speed() == b->get_speed() ) && ( ( a->get_team() == attacker_team ) && ( b->get_team() != attacker_team ) ) ); }; // lambda function to use in the sort
       std::sort( turns->begin(), turns->end(), compare_speeds );
 }
 
@@ -484,8 +512,9 @@ void Battle::set_up_wait_turns()
 {
       auto wait_turns = get_wait_turns();
 
+      auto defender_team = get_defender()->get_team();
       // order the turns of the stacks according to their speed - from slow to fast, and if the speeds match, then the defender gets to move first
-      auto compare_speeds = [&](Stack* a, Stack* b){ return ( a->get_speed() < b->get_speed() ) + ( a->get_speed() == b->get_speed() )*( b->get_team() == get_defender()->get_team() ); }; // lambda function to use in the sort
+      auto compare_speeds = [&](Stack* a, Stack* b) -> bool { return ( a->get_speed() < b->get_speed() ) || ( ( a->get_speed() == b->get_speed() ) && ( ( b->get_team() == defender_team ) && ( a->get_team() != defender_team ) ) ); }; // lambda function to use in the sort
       std::sort( wait_turns->begin(), wait_turns->end(), compare_speeds );
 }
 
@@ -538,7 +567,6 @@ void Battle::new_turn()
             // reduce the duration of spells acting on the stack
       }
 }
-
 
 void Battle::on_stack_turn(Stack* stack, bool morale_rolled)
 {
@@ -607,7 +635,7 @@ void Battle::on_stack_turn(Stack* stack, bool morale_rolled)
       {
             if( (stack->get_creature()->get_has_fireball_attack() || stack->get_creature()->get_has_cloud_attack()) && stack_can_shoot(stack) ) // Magogs and Power Liches can shoot at positions
             {
-                  printf("\nDo you wish the stack to target another stack (S) or a position on the battlefield (P) %s : (S/P)\n");
+                  printf("\nDo you wish the stack to target another stack (S) or a position on the battlefield (P) : (S/P)\n");
                   std::string target;
                   std::cin >> target;
 
@@ -648,21 +676,16 @@ void Battle::on_stack_turn(Stack* stack, bool morale_rolled)
                   }
                   printf("\n");
 
-                  if( !stack_can_shoot(stack, enemy_stack) ) // needs to be checked every time because of 'Force Field'
+                  if( !stack_can_shoot(stack, enemy_stack) && // needs to be checked every time because of 'Force Field'
+                      !enemy_is_reachable(stack, enemy_stack) ) 
                   {
-                        if( !enemy_is_reachable(stack, enemy_stack) )
-                        {
-                              printf("This enemy stack is not reachable. Please select a different enemy. Symbol = ");
-                              std::cin >> symbol;
-                              printf("\n");
-
-                        }
-                        else
-                              break;
+                        printf("This enemy stack is not reachable. Please select a different enemy. Symbol = ");
+                        std::cin >> symbol;
+                        printf("\n");
                   }
                   else
                         break;
-            }   
+            }
 
             attack_stack( stack, enemy_stack );
       }
@@ -688,38 +711,38 @@ bool Battle::roll_negative_morale(Stack* const stack)
 {
       uint16_t probability = 0;
 
-      const Morale morale = static_cast<Morale>( static_cast<int8_t>(stack->get_morale()) + 1*get_has_angel_ally(stack) + (-1)*get_has_necro_dragon_enemy(stack) ); // should be done every time
+      const Morale morale = clamp_morale( stack->get_morale() + Morale::Good*get_ally_has_angel(stack) + Morale::Bad*get_enemy_has_necro_dragon(stack) ); // should be done every time
 
       switch(morale)
       {
-            case Morale::Terrible : probability = 250; break;
-            case Morale::Awful    : probability = 167; break;
-            case Morale::Bad      : probability =  83; break;
-            case Morale::Neutral  : probability =   0; break; // written because of compiler warnings (I prefer not to silence them as errors might be missed)
-            case Morale::Good     : probability =   0; break; // written because of compiler warnings (I prefer not to silence them as errors might be missed)
-            case Morale::Great    : probability =   0; break; // written because of compiler warnings (I prefer not to silence them as errors might be missed)
-            case Morale::Superb   : probability =   0; break; // written because of compiler warnings (I prefer not to silence them as errors might be missed)
+            case Morale::Terrible : probability = PROBABILITY_TERRIBLE; break;
+            case Morale::Awful    : probability = PROBABILITY_AWFUL;    break;
+            case Morale::Bad      : probability = PROBABILITY_BAD;      break;
+            case Morale::Neutral  : probability = PROBABILITY_NEUTRAL;  break; // written because of compiler warnings (I prefer not to silence them as errors might be missed)
+            case Morale::Good     : probability = PROBABILITY_NEUTRAL;  break; // written because of compiler warnings (I prefer not to silence them as errors might be missed)
+            case Morale::Great    : probability = PROBABILITY_NEUTRAL;  break; // written because of compiler warnings (I prefer not to silence them as errors might be missed)
+            case Morale::Superb   : probability = PROBABILITY_NEUTRAL;  break; // written because of compiler warnings (I prefer not to silence them as errors might be missed)
       }
-      return rand() % 1000 < probability; // intentionaly not used with 'new', so battles can be replayed with the same rolls
+      return rand() % RANDOM_LIMIT < probability; // intentionaly not used with 'new', so battles can be replayed with the same rolls
 }
 
 bool Battle::roll_positive_morale(Stack* const stack)
 {
       uint16_t probability = 0;
 
-      const Morale morale = static_cast<Morale>( static_cast<int8_t>(stack->get_morale()) + 1*get_has_angel_ally(stack) + (-1)*get_has_necro_dragon_enemy(stack) ); // should be done every time
+      const Morale morale = clamp_morale( stack->get_morale() + Morale::Good*get_ally_has_angel(stack) + Morale::Bad*get_enemy_has_necro_dragon(stack) ); // should be done every time
 
       switch(morale)
       {
-            case Morale::Terrible : probability =   0; break; // written because of compiler warnings (I prefer not to silence them as errors might be missed)
-            case Morale::Awful    : probability =   0; break; // written because of compiler warnings (I prefer not to silence them as errors might be missed)
-            case Morale::Bad      : probability =   0; break; // written because of compiler warnings (I prefer not to silence them as errors might be missed)
-            case Morale::Neutral  : probability =   0; break; // written because of compiler warnings (I prefer not to silence them as errors might be missed)
-            case Morale::Good     : probability =  42; break;
-            case Morale::Great    : probability =  83; break;
-            case Morale::Superb   : probability = 125; break;
+            case Morale::Terrible : probability = PROBABILITY_NEUTRAL; break; // written because of compiler warnings (I prefer not to silence them as errors might be missed)
+            case Morale::Awful    : probability = PROBABILITY_NEUTRAL; break; // written because of compiler warnings (I prefer not to silence them as errors might be missed)
+            case Morale::Bad      : probability = PROBABILITY_NEUTRAL; break; // written because of compiler warnings (I prefer not to silence them as errors might be missed)
+            case Morale::Neutral  : probability = PROBABILITY_NEUTRAL; break; // written because of compiler warnings (I prefer not to silence them as errors might be missed)
+            case Morale::Good     : probability = PROBABILITY_GOOD;    break;
+            case Morale::Great    : probability = PROBABILITY_GREAT;   break;
+            case Morale::Superb   : probability = PROBABILITY_SUPERB;  break;
       }
-      return rand() % 1000 < probability; // intentionaly not used with 'new', so battles can be replayed with the same rolls
+      return rand() % RANDOM_LIMIT < probability; // intentionaly not used with 'new', so battles can be replayed with the same rolls
 }
 
 int8_t Battle::roll_luck(Stack* const stack)
@@ -729,21 +752,21 @@ int8_t Battle::roll_luck(Stack* const stack)
       uint16_t probability;
       int8_t sign;
 
-      const Luck luck = static_cast<Luck>( static_cast<int8_t>(stack->get_luck()) + std::min( (-1)*get_has_devil_enemy(stack), (-2)*get_has_archdevil_enemy(stack) ) ); // should be done every time
+      const Luck luck = clamp_luck( stack->get_luck() + std::min( Luck::Bad*get_enemy_has_devil(stack), Luck::Awful*get_enemy_has_archdevil(stack) ) ); // should be done every time
 
-      const bool leprechauns_in_army = get_has_leprechaun_ally(stack);
+      const bool leprechauns_in_army = get_ally_has_leprechaun(stack);
 
       switch(luck)
       {
-            case Luck::Terrible : probability = 250*(1 + leprechauns_in_army); sign = -1; break;
-            case Luck::Awful    : probability = 167*(1 + leprechauns_in_army); sign = -1; break;
-            case Luck::Bad      : probability =  83*(1 + leprechauns_in_army); sign = -1; break;
-            case Luck::Neutral  : probability =   0*(1 + leprechauns_in_army); sign =  0; break;
-            case Luck::Good     : probability =  42*(1 + leprechauns_in_army); sign =  1; break;
-            case Luck::Great    : probability =  83*(1 + leprechauns_in_army); sign =  1; break;
-            case Luck::Superb   : probability = 125*(1 + leprechauns_in_army); sign =  1; break;
+            case Luck::Terrible : probability = PROBABILITY_TERRIBLE*(1 + leprechauns_in_army); sign = -1; break;
+            case Luck::Awful    : probability = PROBABILITY_AWFUL   *(1 + leprechauns_in_army); sign = -1; break;
+            case Luck::Bad      : probability = PROBABILITY_BAD     *(1 + leprechauns_in_army); sign = -1; break;
+            case Luck::Neutral  : probability = PROBABILITY_NEUTRAL *(1 + leprechauns_in_army); sign =  0; break;
+            case Luck::Good     : probability = PROBABILITY_GOOD    *(1 + leprechauns_in_army); sign =  1; break;
+            case Luck::Great    : probability = PROBABILITY_GREAT   *(1 + leprechauns_in_army); sign =  1; break;
+            case Luck::Superb   : probability = PROBABILITY_SUPERB  *(1 + leprechauns_in_army); sign =  1; break;
       }
-      return sign*(rand() % 1000 < probability); // intentionaly not used with 'new', so battles can be replayed with the same rolls
+      return sign*(rand() % RANDOM_LIMIT < probability); // intentionaly not used with 'new', so battles can be replayed with the same rolls
 }
 
 std::string Battle::select_action_for_stack(const bool stack_can_wait)
@@ -791,8 +814,8 @@ void Battle::set_global_buffs_and_debuffs()
       const std::string item_1 = "Spirit of Oppression";
       const std::string item_2 = "Hourglass of the Evil Hour";
 
-      _spirit_of_oppression_present   = get_attacker()->check_eqipped_item(item_1, slot) + get_defender()->check_eqipped_item(item_1, slot);
-      _hourglass_of_evil_hour_present = get_attacker()->check_eqipped_item(item_2, slot) + get_defender()->check_eqipped_item(item_2, slot);
+      m_spirit_of_oppression_present   = get_attacker()->check_eqipped_item(item_1, slot) + get_defender()->check_eqipped_item(item_1, slot);
+      m_hourglass_of_evil_hour_present = get_attacker()->check_eqipped_item(item_2, slot) + get_defender()->check_eqipped_item(item_2, slot);
 
       // Update hero's power skills according to enemy's items reducing enemy power skill
       auto attacker = get_attacker();
@@ -814,16 +837,16 @@ void Battle::set_global_buffs_and_debuffs()
 
       // Set up conditions for bonuses according to creatures' special abilities
       std::array<Hero*, 2> heroes = { attacker, defender };
-      for( auto hero : heroes)
+      for( auto hero : heroes )
             for( uint8_t i = 0; i < Hero_slots::ARMY; i++ )
             {
                   auto const c = hero->get_army_stack(i)->get_creature();
 
-                  _angel_present        += c->get_increases_alias_morale_1();
-                  _necro_dragon_present += c->get_decreases_enemy_morale_1();
-                  _devil_present        += c->get_decreases_enemy_luck_1();
-                  _archdevil_present    += c->get_decreases_enemy_luck_2();
-                  _leprechaun_present   += c->get_doubles_luck_chance();
+                  m_angel_present        += c->get_increases_alias_morale_by_1();
+                  m_necro_dragon_present += c->get_decreases_enemy_morale_by_1();
+                  m_devil_present        += c->get_decreases_enemy_luck_by_1();
+                  m_archdevil_present    += c->get_decreases_enemy_luck_by_2();
+                  m_leprechaun_present   += c->get_doubles_luck_chance();
             }
 }
 
@@ -851,44 +874,50 @@ uint8_t Battle::get_distance_between_stacks(Stack* const stack, Stack* const ene
       return std::abs(stack->get_position().x - enemy_stack->get_position().x) + std::abs(stack->get_position().y - enemy_stack->get_position().y);
 }
 
-Position* Battle::select_location_around_enemy_stack(Stack* const stack, Stack* const enemy_stack)
+void Battle::select_location_around_enemy_stack(Position& pos, Stack* const stack, Stack* const enemy_stack)
 {
+      // Make sure the map is empty.
+      std::fill(m_positions_around_stack, m_positions_around_stack + 8, Position(-1, -1));
+
       // Search for locations from which to attack the defending stack
-      const uint8_t ex = enemy_stack->get_position().x;
-      const uint8_t ey = enemy_stack->get_position().y;
+      Position const enemy_pos = enemy_stack->get_position();
+      const int8_t x_min = std::max(0, enemy_pos.x - 1);
+      const int8_t y_min = std::max(0, enemy_pos.y - 1);
+      const int8_t x_max = std::min(Battlefield::LENGTH - 1, enemy_pos.x + 1);
+      const int8_t y_max = std::min(Battlefield::WIDTH  - 1, enemy_pos.y + 1);
 
-      std::map< uint8_t, std::unique_ptr<Position> > positions;
-      uint8_t counter = 1;
+      uint8_t counter = 0;
 
-      for( int8_t i = std::max(0, ey - 1); i <= std::min(Battlefield::WIDTH - 1, ey + 1); i++ )
-            for( int8_t j = std::max(0, ex - 1); j <= std::min(Battlefield::LENGTH - 1, ex + 1); j++ )
+      for( uint8_t i = y_min; i <= y_max; ++i )
+            for( uint8_t j = x_min; j <= x_max; ++j )
                   if( tile_is_reachable(j, i, stack) )
                   {
-                        positions[counter] = std::unique_ptr<Position>(new Position(j, i));
+                        m_positions_around_stack[counter].x = j;
+                        m_positions_around_stack[counter].y = i;
                         counter++;
                   }
 
-      if( positions.size() > 1 )
+      if(counter)
       {
             printf("Possible locations to attack from :\n");
-            for( auto & p : positions)
-                  printf("Location %d = [%d;%d]\n", p.first, p.second->x, p.second->y);
+            for( uint8_t i = 0; i < counter; ++i )
+                  printf("Location %d = [%d;%d]\n", i + 1, m_positions_around_stack[i].x, m_positions_around_stack[i].y);
 
             printf("Select a locations to attack from. Location = ");
 
             uint16_t location = 0;
             std::cin >> location;
-            while( location < 0 || location > counter )
+            while( location < 0 || location >= counter )
             {
                   printf("\nLocation = ");
                   std::cin >> location;
             }
             printf("\n");
             
-            return positions[location].get();
+            pos = m_positions_around_stack[location - 1];
       }
       else // if no other positions are available
-            return positions[1].get(); // counter starts from 1
+            pos = m_positions_around_stack[counter]; // counter is unchaged, so this returns the only value existing in the map
 }
 
 Stack* Battle::find_existing_enemy_stack_via_symbol(const char ch, const Team team)
@@ -1008,9 +1037,9 @@ void Battle::move_stack(Stack* stack, const uint8_t x, const uint8_t y)
             uint8_t distance_traveled = 0;
             uint8_t current_x = x; // this should be = pos.x and suffer changes step by step
             uint8_t current_y = y; // this should be = pos.y and suffer changes step by step
-            
+
             while( distance )
-            {  
+            {
                   // TO DO : implement movement patterns - current_x and current_y change step by step according to the patterns
                   if( battlefield[current_y][current_x].get_tile() != Battlefield_Tile::Tile::Quicksand ) // TO DO : implement team immunity to quicksands
                   {
@@ -1055,15 +1084,17 @@ void Battle::attack_stack(Stack* attacking_stack, Stack* defending_stack)
 
             if( answer == 'Y' )
             {
-                  Position* pos = select_location_around_enemy_stack(attacking_stack, defending_stack);
-                  move_stack(attacking_stack, pos->x, pos->y);
+                  Position pos{};
+                  select_location_around_enemy_stack(pos, attacking_stack, defending_stack);
+                  move_stack(attacking_stack, pos.x, pos.y);
             }
       }
       else
             if( !stack_can_shoot(attacking_stack, defending_stack) )
             {
-                  Position* pos = select_location_around_enemy_stack(attacking_stack, defending_stack);
-                  move_stack(attacking_stack, pos->x, pos->y);
+                  Position pos{};
+                  select_location_around_enemy_stack(pos, attacking_stack, defending_stack);
+                  move_stack(attacking_stack, pos.x, pos.y);
             }
       
       target_and_inflict_damage(attacking_stack, defending_stack);
@@ -1160,8 +1191,8 @@ void Battle::inflict_damage(Stack* const attacking_stack, Stack* const defending
       uint32_t final_damage = 0;
       uint32_t base_damage  = 0;
 
-      float I1(0.f), I2(0.f), I3(0.f), I4(0.f), I5(0.f); // increase damage
-      float R1(0.f), R2(0.f), R3(0.f), R4(0.f), R5(0.f), R6(0.f), R7(0.f), R8(0.f); // reduce damage
+      float I1(PERCENT_0), I2(PERCENT_0), I3(PERCENT_0), I4(PERCENT_0), I5(PERCENT_0); // increase damage
+      float R1(PERCENT_0), R2(PERCENT_0), R3(PERCENT_0), R4(PERCENT_0), R5(PERCENT_0), R6(PERCENT_0), R7(PERCENT_0), R8(PERCENT_0); // reduce damage
 
       // Get the heroes of the two stack
       auto const attacking_hero = get_hero_of_stack(attacking_stack);
@@ -1200,99 +1231,99 @@ void Battle::inflict_damage(Stack* const attacking_stack, Stack* const defending
 
       // calculate I1 - Attack > Defense bonus
       if( attacking_stack_attack >= defending_stack_defense )
-            I1 = 0.05 * (attacking_stack_attack - defending_stack_defense);
+            I1 = PERCENT_5 * (attacking_stack_attack - defending_stack_defense);
 
       // calculate I2 and I3 - secondary skill and specialty in Archery / Offense bonus
       if( attacking_stack_is_ranged && can_shoot )
       {
             switch( attacking_hero->get_secondary_skill_level("Archery") )
             {
-                  case Skill_level::None :     I2 = 0.00f; break;
-                  case Skill_level::Basic :    I2 = 0.10f; break;
-                  case Skill_level::Advanced : I2 = 0.25f; break;
-                  case Skill_level::Expert :   I2 = 0.50f; break;
+                  case Skill_level::None     : I2 = PERCENT_0;  break;
+                  case Skill_level::Basic    : I2 = PERCENT_10; break;
+                  case Skill_level::Advanced : I2 = PERCENT_25; break;
+                  case Skill_level::Expert   : I2 = PERCENT_50; break;
             }
 
             if( attacking_hero->get_specialty().get_name() == "Archery" )
-                  I3 = 0.05 * I2 * attacking_hero->get_level();
+                  I3 = PERCENT_5 * I2 * attacking_hero->get_level();
       }
       else // is ranged but has melee penalty or is not ranged
       {
             switch( attacking_hero->get_secondary_skill_level("Offense") )
             {
-                  case Skill_level::None :     I2 = 0.00f; break;
-                  case Skill_level::Basic :    I2 = 0.10f; break;
-                  case Skill_level::Advanced : I2 = 0.20f; break;
-                  case Skill_level::Expert :   I2 = 0.30f; break;
+                  case Skill_level::None     : I2 = PERCENT_0; break;
+                  case Skill_level::Basic    : I2 = PERCENT_10; break;
+                  case Skill_level::Advanced : I2 = PERCENT_20; break;
+                  case Skill_level::Expert   : I2 = PERCENT_30; break;
             }
 
             if( attacking_hero->get_specialty().get_name() == "Offense")
-                  I3 = 0.05 * I2 * attacking_hero->get_level();
+                  I3 = PERCENT_5 * I2 * attacking_hero->get_level();
       }
 
       // calculate I4 - luck bonus
       const int8_t rolled_luck = roll_luck(attacking_stack);
-      I4 = -0.5*(rolled_luck <  0) + /*  0.0*( rolled_luck == 0) + */  1.0*(rolled_luck >  0) * (1 - get_hourglass_of_evil_hour_present());
+      I4 = -PERCENT_50*(rolled_luck <  0) + /*  PERCENT_0*( rolled_luck == 0) + */  PERCENT_100*(rolled_luck >  0) * (1 - get_hourglass_of_evil_hour_present());
 
       // calculate I5 - special ability bonus
       // death blow bonus
       if( attacking_creature->get_may_cast_death_blow() )
-            I5 = ( (rand() % 100) < Special_abilities::Chance_to_cast::DEATH_BLOW ) * 1.00f;
+            I5 = ( (rand() % 100) < Special_abilities::Chance_to_cast::DEATH_BLOW ) * PERCENT_100;
 
       // hate bonus
-      if     ( attacking_creature->get_hates_efreeti()       && ( *defending_creature == Creature_List::Efreet || *defending_creature == Creature_List::Efreet_Sultan ) ) I5 = 0.50f;
-      else if( attacking_creature->get_hates_genies()        && ( *defending_creature == Creature_List::Genie  || *defending_creature == Creature_List::Master_Genie )  ) I5 = 0.50f;
-      else if( attacking_creature->get_hates_devils()        && ( *defending_creature == Creature_List::Devil  || *defending_creature == Creature_List::Arch_Devil )    ) I5 = 0.50f;
-      else if( attacking_creature->get_hates_angels()        && ( *defending_creature == Creature_List::Angel  || *defending_creature == Creature_List::Archangel )     ) I5 = 0.50f;
-      else if( attacking_creature->get_hates_black_dragons() &&   *defending_creature == Creature_List::Black_Dragon ) I5 = 0.50f;
-      else if( attacking_creature->get_hates_titans()        &&   *defending_creature == Creature_List::Titan        ) I5 = 0.50f;
+      if     ( attacking_creature->get_hates_efreeti()       && ( *defending_creature == Creature_List::Efreet || *defending_creature == Creature_List::Efreet_Sultan ) ) I5 = PERCENT_50;
+      else if( attacking_creature->get_hates_genies()        && ( *defending_creature == Creature_List::Genie  || *defending_creature == Creature_List::Master_Genie )  ) I5 = PERCENT_50;
+      else if( attacking_creature->get_hates_devils()        && ( *defending_creature == Creature_List::Devil  || *defending_creature == Creature_List::Arch_Devil )    ) I5 = PERCENT_50;
+      else if( attacking_creature->get_hates_angels()        && ( *defending_creature == Creature_List::Angel  || *defending_creature == Creature_List::Archangel )     ) I5 = PERCENT_50;
+      else if( attacking_creature->get_hates_black_dragons() &&   *defending_creature == Creature_List::Black_Dragon ) I5 = PERCENT_50;
+      else if( attacking_creature->get_hates_titans()        &&   *defending_creature == Creature_List::Titan        ) I5 = PERCENT_50;
 
       // elementals bonus
-      if     ( ( *attacking_creature == Creature_List::Air_Elemental   || *attacking_creature == Creature_List::Storm_Elemental  ) && ( *defending_creature == Creature_List::Earth_Elemental || *defending_creature == Creature_List::Magma_Elemental  ) ) I5 = 1.00f;
-      else if( ( *attacking_creature == Creature_List::Water_Elemental || *attacking_creature == Creature_List::Ice_Elemental    ) && ( *defending_creature == Creature_List::Fire_Elemental  || *defending_creature == Creature_List::Energy_Elemental ) ) I5 = 1.00f;
-      else if( ( *attacking_creature == Creature_List::Fire_Elemental  || *attacking_creature == Creature_List::Energy_Elemental ) && ( *defending_creature == Creature_List::Water_Elemental || *defending_creature == Creature_List::Ice_Elemental    ) ) I5 = 1.00f;
-      else if( ( *attacking_creature == Creature_List::Earth_Elemental || *attacking_creature == Creature_List::Magma_Elemental  ) && ( *defending_creature == Creature_List::Air_Elemental   || *defending_creature == Creature_List::Storm_Elemental  ) ) I5 = 1.00f;
+      if     ( ( *attacking_creature == Creature_List::Air_Elemental   || *attacking_creature == Creature_List::Storm_Elemental  ) && ( *defending_creature == Creature_List::Earth_Elemental || *defending_creature == Creature_List::Magma_Elemental  ) ) I5 = PERCENT_100;
+      else if( ( *attacking_creature == Creature_List::Water_Elemental || *attacking_creature == Creature_List::Ice_Elemental    ) && ( *defending_creature == Creature_List::Fire_Elemental  || *defending_creature == Creature_List::Energy_Elemental ) ) I5 = PERCENT_100;
+      else if( ( *attacking_creature == Creature_List::Fire_Elemental  || *attacking_creature == Creature_List::Energy_Elemental ) && ( *defending_creature == Creature_List::Water_Elemental || *defending_creature == Creature_List::Ice_Elemental    ) ) I5 = PERCENT_100;
+      else if( ( *attacking_creature == Creature_List::Earth_Elemental || *attacking_creature == Creature_List::Magma_Elemental  ) && ( *defending_creature == Creature_List::Air_Elemental   || *defending_creature == Creature_List::Storm_Elemental  ) ) I5 = PERCENT_100;
 
       // jousting bonus
       if( !defending_creature->get_is_immune_to_jousting() ) 
             if( attacking_creature->get_has_jousting() ) 
-            I5 = 0.05 * attacking_stack->get_distance_traveled();
+            I5 = PERCENT_5 * attacking_stack->get_distance_traveled();
 
 
       // calculate R1 - Defense > Attack penalty
       if( defending_stack_defense >= attacking_stack_attack && ( !attacking_stack_is_ranged || melee_penalty ) )
-            R1 = 0.025 * (defending_stack_defense - attacking_stack_attack);
+            R1 = (PERCENT_5 / 2) * (defending_stack_defense - attacking_stack_attack);
 
       // calculate R2 - Armorer penalty
       switch( defending_hero->get_secondary_skill_level("Armorer") )
       {
-            case Skill_level::None :     R2 = 0.00f; break;
-            case Skill_level::Basic :    R2 = 0.05f; break;
-            case Skill_level::Advanced : R2 = 0.10f; break;
-            case Skill_level::Expert :   R2 = 0.15f; break;
+            case Skill_level::None     : R2 = PERCENT_0;  break;
+            case Skill_level::Basic    : R2 = PERCENT_5;  break;
+            case Skill_level::Advanced : R2 = PERCENT_10; break;
+            case Skill_level::Expert   : R2 = PERCENT_15; break;
       }
 
       // calculate R3 - specialty Armorer penalty
       if( defending_hero->get_specialty().get_name() == "Armorer")
-            R3 = 0.05 * R2 * defending_hero->get_level();
+            R3 = PERCENT_5 * R2 * defending_hero->get_level();
 
       // calculate R4 - spells Shield and Air Shield bonus
       // TO DO : if spells
 
       // calculate R5 - range or melee penalties
-      if     ( range_penalty ) R5 = 0.50f;
-      else if( melee_penalty ) R5 = 0.50f;
+      if     ( range_penalty ) R5 = PERCENT_50;
+      else if( melee_penalty ) R5 = PERCENT_50;
 
       // calculate R6 - obstacle penalty
       // TO DO : if obstacle penalties - siege wall between shooter and defending_stack
-      if( obstacle_penalty ) R6 = 0.50f; // range penalty
+      if( obstacle_penalty ) R6 = PERCENT_50; // range penalty
 
       // calculate R7 - spells Blind and Forgetfulness penalty
       // TO DO : if retaliation or attack after spell
 
       // calculate R8 - special abilities penalty
-      if     ( *attacking_creature == Creature_List::Psychic_Elemental && defending_creature->get_is_immune_to_mind_spells() ) R8 = 0.50f;
-      else if( *attacking_creature == Creature_List::Magic_Elemental   && defending_creature->get_is_immune_to_all_spells()  ) R8 = 0.50f;
+      if     ( *attacking_creature == Creature_List::Psychic_Elemental && defending_creature->get_is_immune_to_mind_spells() ) R8 = PERCENT_50;
+      else if( *attacking_creature == Creature_List::Magic_Elemental   && defending_creature->get_is_immune_to_all_spells()  ) R8 = PERCENT_50;
       // TO DO : implement retaliation after Stone Gaze and Paralyzing Venom
 
 
@@ -1302,15 +1333,15 @@ void Battle::inflict_damage(Stack* const attacking_stack, Stack* const defending
       {
             const uint8_t range = attacking_stack_max_dmg - attacking_stack_min_dmg + 1;
             
-            if( attacking_stack_number <= min_num_for_stack_to_count_as_group_to_calc_rand_dmg )
+            if( attacking_stack_number <= MIN_NUM_FOR_GROUP_DMG_CALC )
                   for(int i = 0; i < attacking_stack_number; i++)
                         base_damage += rand() % range + attacking_stack_min_dmg;
             else
             {
-                  for(int i = 0; i < min_num_for_stack_to_count_as_group_to_calc_rand_dmg; i++)
+                  for(int i = 0; i < MIN_NUM_FOR_GROUP_DMG_CALC; i++)
                         base_damage += rand() % range + attacking_stack_min_dmg;
                   
-                  base_damage = base_damage * attacking_stack_number/min_num_for_stack_to_count_as_group_to_calc_rand_dmg;
+                  base_damage = base_damage * attacking_stack_number/MIN_NUM_FOR_GROUP_DMG_CALC;
             }
       }
 
@@ -1426,8 +1457,8 @@ bool Battle::check_battle_finished()
             
             for( uint8_t i = 0; i < turns->size(); i++ )
             {
-                  if     ( turns->at(i)->get_team() == _attacker.get_team() ) { has_attacker_stack = true; }
-                  else if( turns->at(i)->get_team() == _defender.get_team() ) { has_defender_stack = true; }
+                  if     ( turns->at(i)->get_team() == m_attacker.get_team() ) { has_attacker_stack = true; }
+                  else if( turns->at(i)->get_team() == m_defender.get_team() ) { has_defender_stack = true; }
                   
                   if( has_attacker_stack && has_defender_stack ) // returns false on the first indication of two seperate teams on the battlefield
                         return false;

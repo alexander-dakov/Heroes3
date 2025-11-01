@@ -1,4 +1,13 @@
 #include "Hero.h"
+#include <cstdint>
+
+namespace
+{
+      const uint8_t KNOWLEDGE_TO_MANA_MULTIPLIER = 10;
+      const uint16_t INITIAL_MOVEMENT_POINTS = 1900;
+      const uint8_t MAX_LEVEL = 75;
+      const uint8_t LEVEL_10 = 10;
+}
 
 Hero::Hero( const std::string name, const Gender gender, const Role hero_role, const Faction faction, const Team team, const uint8_t level, const uint32_t experience, 
             const uint8_t attack, const uint8_t defense, const uint8_t power, const uint8_t knowledge,
@@ -7,30 +16,31 @@ Hero::Hero( const std::string name, const Gender gender, const Role hero_role, c
             // secondary skills
             const struct war_machines war_machinery,
             const bool has_spellbook ) :
-            _name(name), _gender(gender), _role(hero_role), _faction(faction), _team(team), _level(level), _experience(experience), 
+            m_name(name), m_gender(gender), m_role(hero_role), m_faction(faction), m_team(team), m_level(level), m_experience(experience), 
             primary_skills(attack, defense, power, knowledge),
-            _specialty(specialty),
-            _morale(morale), _luck(luck),
+            m_specialty(specialty),
+            m_morale(morale), m_luck(luck),
             // {"None", ...} write them in some way and change field in Hero.h,
             war_machines(war_machinery),
-            _has_spellbook(has_spellbook)
+            m_has_spellbook(has_spellbook)
 {
-      switch(_faction)
+      switch(m_faction)
       {
-            case Faction::Castle     : get_role() ? _class = Class::Cleric       : _class = Class::Knight;       break;
-            case Faction::Rampart    : get_role() ? _class = Class::Druid        : _class = Class::Ranger;       break;
-            case Faction::Tower      : get_role() ? _class = Class::Wizard       : _class = Class::Alchemist;    break;
-            case Faction::Inferno    : get_role() ? _class = Class::Heretic      : _class = Class::Demoniac;     break;
-            case Faction::Necropolis : get_role() ? _class = Class::Necromancer  : _class = Class::Death_Knight; break;
-            case Faction::Dungeon    : get_role() ? _class = Class::Warlock      : _class = Class::Overlord;     break;
-            case Faction::Stronghold : get_role() ? _class = Class::Battle_Mage  : _class = Class::Barbarian;    break;
-            case Faction::Fortress   : get_role() ? _class = Class::Witch        : _class = Class::Beastmaster;  break;
-            case Faction::Conflux    : get_role() ? _class = Class::Elementalist : _class = Class::Planeswalker; break;
-            case Faction::Cove       : get_role() ? _class = Class::Navigator    : _class = Class::Captain;      break;
+            case Faction::Castle     : get_role() ? m_class = Class::Cleric       : m_class = Class::Knight;       break;
+            case Faction::Rampart    : get_role() ? m_class = Class::Druid        : m_class = Class::Ranger;       break;
+            case Faction::Tower      : get_role() ? m_class = Class::Wizard       : m_class = Class::Alchemist;    break;
+            case Faction::Inferno    : get_role() ? m_class = Class::Heretic      : m_class = Class::Demoniac;     break;
+            case Faction::Necropolis : get_role() ? m_class = Class::Necromancer  : m_class = Class::Death_Knight; break;
+            case Faction::Dungeon    : get_role() ? m_class = Class::Warlock      : m_class = Class::Overlord;     break;
+            case Faction::Stronghold : get_role() ? m_class = Class::Battle_Mage  : m_class = Class::Barbarian;    break;
+            case Faction::Fortress   : get_role() ? m_class = Class::Witch        : m_class = Class::Beastmaster;  break;
+            case Faction::Conflux    : get_role() ? m_class = Class::Elementalist : m_class = Class::Planeswalker; break;
+            case Faction::Cove       : get_role() ? m_class = Class::Navigator    : m_class = Class::Captain;      break;
+            case Faction::Neutral    : break; // this is added to satisfy a compiler warning
       }
-      _mana = knowledge*10;
-      _mana_left = _mana;
-      _movement_points = 1560; // TO DO : implement movement points according to army
+      m_mana = knowledge * KNOWLEDGE_TO_MANA_MULTIPLIER;
+      m_mana_left = m_mana;
+      m_movement_points = INITIAL_MOVEMENT_POINTS; // TO DO : implement movement points according to army
 }
 
 Hero::~Hero()
@@ -47,22 +57,16 @@ std::string Hero::get_gender_as_string()
 
 std::string Hero::get_role_as_string()
 {
-      std::string hero_role;
-
-      switch(get_role())
-      {
-            case Role::Might : hero_role = "Might"; break;
-            case Role::Magic : hero_role = "Magic"; break;
-      }
-
-      return hero_role;
+      if( get_role() == Role::Might )  
+            return "Might";
+      return "Magic";
 }
 
 std::string Hero::get_class_as_string()
 {
       std::string hero_class;
 
-      switch(get_class())
+      switch( get_class() )
       {
             case Class::Knight       : hero_class = "Knight";       break;
             case Class::Cleric       : hero_class = "Cleric";       break;
@@ -93,7 +97,7 @@ std::string Hero::get_faction_as_string()
 {
       std::string faction;
 
-      switch(get_faction())
+      switch( get_faction() )
       {
             case Faction::Neutral    : faction = "Neutral";    break;
             case Faction::Castle     : faction = "Castle";     break;
@@ -115,7 +119,7 @@ std::string Hero::get_team_as_string()
 {
       std::string team;
 
-      switch(get_team())
+      switch( get_team() )
       {
             case Team::Neutral : team = "Neutral"; break;
             case Team::Red     : team = "Red";     break;
@@ -133,9 +137,9 @@ std::string Hero::get_team_as_string()
 
 void Hero::add_level(const uint8_t level)
 {
-      if( get_level() == 75 )
+      if( get_level() == MAX_LEVEL )
       {
-            printf( "\n%s has reached max level!\n", get_name() );
+            printf( "\n%s has reached max level!\n", get_name().c_str() );
             return;
       }
 
@@ -146,7 +150,7 @@ void Hero::add_level(const uint8_t level)
 
       uint8_t probability = rand() % 100;
 
-      bool x = get_level() > 10;
+      bool x = get_level() > LEVEL_10;
 
       switch( get_class() )
       {
@@ -201,9 +205,9 @@ void Hero::add_experience(const uint32_t experience)
 {
       const uint8_t current_level = get_level();
 
-      if( current_level == 75 )
+      if( current_level == MAX_LEVEL )
       {
-            printf( "\n%s has reached max level, so %s cannot gain more experience!\n", get_name(), get_gender() ? "he" : "she" );
+            printf( "\n%s has reached max level, so %s cannot gain more experience!\n", get_name().c_str(), get_gender() ? "he" : "she" );
             return;
       }
 
@@ -213,8 +217,8 @@ void Hero::add_experience(const uint32_t experience)
       if( new_experience > Level_Experience::MAX_EXPERIENCE )
       {
             set_experience( Level_Experience::MAX_EXPERIENCE );
-            levels_gained = 75 - current_level;
-            printf( "\n%s has reached max experience!\n", get_name() );
+            levels_gained = MAX_LEVEL - current_level;
+            printf( "\n%s has reached max experience!\n", get_name().c_str() );
       }
       else
       {
@@ -248,7 +252,7 @@ Skill_level Hero::get_secondary_skill_level(const std::string skill_name)
       return Skill_level::None;
 }
 
-void Hero::pick_up_item(Item* item)
+void Hero::pick_up_item(const Item* item)
 {
       switch( item->get_slot() )
       {
@@ -264,7 +268,7 @@ void Hero::pick_up_item(Item* item)
       }
 }
 
-void Hero::equip_item_from_chest(Item* item)
+void Hero::equip_item_from_chest(const Item* item)
 {
       for( uint8_t i = 0; i < Hero_slots::CHEST; i++ )
             if( chest[i] == item )
@@ -286,7 +290,7 @@ void Hero::equip_item_from_chest(Item* item)
       printf( "\nItem '%s' not found in treasure chest!\n", item->get_name().c_str() );
 }
 
-void Hero::equip_item(Item* item)
+void Hero::equip_item(const Item* item)
 {
       switch( item->get_slot() )
       {
@@ -351,7 +355,7 @@ void Hero::equip_item(Item* item)
       update_army_stats();
 }
 
-void Hero::unequip_item(Item* item)
+void Hero::unequip_item(const Item* item)
 {
       switch( item->get_slot() )
       {
@@ -410,7 +414,7 @@ void Hero::unequip_item(Item* item)
       update_army_stats();
 }
 
-bool Hero::add_item_to_chest(Item* item)
+bool Hero::add_item_to_chest(const Item* item)
 {
       for( uint8_t i = 0; i < Hero_slots::CHEST; i++ )
             if( chest[i] == nullptr )
@@ -425,7 +429,7 @@ bool Hero::add_item_to_chest(Item* item)
 
 bool Hero::check_eqipped_item(std::string item_name, Item::Slot slot)
 {
-      std::map<Item::Slot, Item*> items_map;
+      std::map<Item::Slot, const Item*> items_map;
       items_map[Item::Slot::Helmet]   = items.helmet;
       items_map[Item::Slot::Cape]     = items.cape;
       items_map[Item::Slot::Necklace] = items.necklace;
@@ -435,26 +439,32 @@ bool Hero::check_eqipped_item(std::string item_name, Item::Slot slot)
       items_map[Item::Slot::Boots]    = items.boots;
 
       if(slot == Item::Slot::Hand)
+      {
             for( uint8_t i = 0; i < Hero_slots::HAND; i++)
                   if( items.hand[i] != nullptr )
                         if( items.hand[i] ->get_name() == item_name )
                               return true;
+      }
       else if(slot == Item::Slot::Pocket)
+      {
             for( uint8_t i = 0; i < Hero_slots::POCKET; i++)
                   if( items.pocket[i] != nullptr )
                         if( items.pocket[i]->get_name() == item_name )
                               return true;
+      }
       else
+      {
             if( items_map[slot] != nullptr )
                   if( items_map[slot]->get_name() == item_name )
                         return true;
+      }
 
       return false;
 }
 
 void Hero::print_equipped_items()
 {
-      std::map<Item::Slot, Item*> items_map;
+      std::map<Item::Slot, const Item*> items_map;
       items_map[Item::Slot::Helmet]   = items.helmet;
       items_map[Item::Slot::Cape]     = items.cape;
       items_map[Item::Slot::Necklace] = items.necklace;
@@ -569,13 +579,13 @@ void Hero::remove_stack_from_position(const uint8_t slot)
 
 void Hero::swap_stack_positions(uint8_t i, uint8_t j)
 {
-      if( i < 0 || i > Hero_slots::ARMY - 1 )
+      if( i > Hero_slots::ARMY - 1 )
       {
             std::cerr << "Slot positions must be in the range [0;" << Hero_slots::ARMY - 1 << "]!" << std::endl;
             abort();
       }
 
-      if( j < 0 || j > Hero_slots::ARMY - 1 )
+      if( j > Hero_slots::ARMY - 1 )
       {
             std::cerr << "Slot positions must be in the range [0;" << Hero_slots::ARMY - 1 << "]!" << std::endl;
             abort();
@@ -602,12 +612,7 @@ void Hero::swap_entire_armies(Hero& hero)
 
 void Hero::update_army_stats()
 {      
-      uint8_t att   = get_attack();
-      uint8_t def   = get_defense();
-      Morale morale = get_morale();
-      Luck luck     = get_luck();
-
-      bool has_equipped_elixir_of_life = _has_equipped_elixir_of_life;
+      bool has_equipped_elixir_of_life = m_has_equipped_elixir_of_life;
 
       const uint8_t hero_level = get_level();
       const std::string specialty_name = get_specialty().get_name();
@@ -679,8 +684,8 @@ void Hero::update_army_stats()
             {
                   auto const c = army[i]->get_creature();
 
-                  army[i]->set_att( c->get_att() + att );
-                  army[i]->set_def( c->get_def() + def );
+                  army[i]->set_att( c->get_att() + get_attack() );
+                  army[i]->set_def( c->get_def() + get_defense() );
                   
                   army[i]->set_hp( c->get_hp() + get_army_hp_bonus() + (c->get_hp()/4)*has_equipped_elixir_of_life );
                   army[i]->set_hp_left( c->get_hp() );
@@ -689,28 +694,17 @@ void Hero::update_army_stats()
 
                   army[i]->set_speed( c->get_speed() + get_army_speed_bonus() );
 
-                  army[i]->set_morale( static_cast<Morale>( std::min( std::max( static_cast<int8_t>(c->get_morale()) + static_cast<int8_t>(get_morale()) + static_cast<int8_t>(morale_penalty), -3), 3) ) );
-                  if( c->get_is_undead() || ( c->get_is_bloodless() && ( c->get_name() != "Stone Gargoyle" && c->get_name() != "Obsidian Gargoyle" ) ) )
+                  army[i]->set_morale( clamp_morale( c->get_morale() + get_morale() + morale_penalty ) );
+                  if( c->get_is_undead() || ( c->get_is_bloodless() && ( *c != Creature_List::Stone_Gargoyle && *c == Creature_List::Obsidian_Gargoyle ) ) )
                         army[i]->set_morale( Morale::Neutral );
-                  if( c->get_minimum_morale_1() && static_cast<int8_t>(army[i]->get_morale()) < 1 )
+                  if( c->get_minimum_morale_1() && army[i]->get_morale() < Morale::Good )
                         army[i]->set_morale( Morale::Good );
 
-                  army[i]->set_luck( static_cast<Luck>( std::min( std::max( static_cast<int8_t>(c->get_luck()) + static_cast<int8_t>(get_luck()), -3), 3) ) );
-                  if( c->get_minimum_luck_1() && static_cast<int8_t>(army[i]->get_luck()) < 1 )
+                  army[i]->set_luck( clamp_luck( c->get_luck() + get_luck() ) );
+                  if( c->get_minimum_luck_1() && army[i]->get_luck() < Luck::Good )
                         army[i]->set_luck( Luck::Good );
             }
       }
-}
-
-Stack* Hero::get_army_stack(uint8_t i)
-{
-      if( i > Hero_slots::ARMY )
-      {
-            std::cerr << i << "is invalid army position!" << std::endl;
-            abort();
-      }
-
-      return army[i].get();
 }
 
 std::unique_ptr<Stack> & Hero::get_army_stack_ptr(uint8_t i)
@@ -720,8 +714,13 @@ std::unique_ptr<Stack> & Hero::get_army_stack_ptr(uint8_t i)
             std::cerr << i << "is invalid army position!" << std::endl;
             abort();
       }
-
+      
       return army[i];
+}
+
+Stack* Hero::get_army_stack(uint8_t i)
+{
+      return get_army_stack_ptr(i).get();
 }
 
 // this is not accurate representation of the hero movement in the game
@@ -730,13 +729,13 @@ std::unique_ptr<Stack> & Hero::get_army_stack_ptr(uint8_t i)
 // TO DO : fix move()
 void Hero::move(const uint8_t x, const uint8_t y)
 {
-    const uint8_t distance = std::abs(x - _position.x) + std::abs(y - _position.y);
+    const uint8_t distance = std::abs(x - m_position.x) + std::abs(y - m_position.y);
     while(get_movement_points() < distance)
     {
-        printf("%s only has %d movement points and can't move that far. Pick a new position!", get_name(), get_movement_points());
+        printf("%s only has %d movement points and can't move that far. Pick a new position!", get_name().c_str(), get_movement_points());
     }
-    _position.x = x;
-    _position.y = y;
+    m_position.x = x;
+    m_position.y = y;
 }
 
 void Hero::print_full_info()

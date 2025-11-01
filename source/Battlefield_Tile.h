@@ -2,17 +2,19 @@
 #define BATTLEFIELD_TILE_H
 
 #include <iostream>
+#include <cstdint>
 #include <vector>
-#include "../utilities/types.h"
+
+// #include "../utilities/types.h"
 #include "Team.h"
 #include "Creature_Stack.h"
 
 
 namespace Battlefield
 {
-    constexpr uint8_t LENGTH = 15;
-    constexpr uint8_t WIDTH  = 11;
-    constexpr char ARMY_CHAR = '+'; // used for default army character in function arguments
+    const uint8_t LENGTH = 15;
+    const uint8_t WIDTH  = 11;
+    const char ARMY_CHAR = '+'; // used for default army character in function arguments
 };
 
 
@@ -33,20 +35,31 @@ struct Battlefield_Tile
         };
         
     private:
-        char _symbol = '_';
-        Tile _tile = Tile::Normal;
-        Team _team = Team::Neutral; // for representation purposes
+        char m_symbol = '_';
+        Tile m_tile = Tile::Normal;
+        Team m_team = Team::Neutral; // for representation purposes
     
     public:
+        // Default and parametrized constructors, used upon starting a battle, to build the battlefield.
         Battlefield_Tile( const Tile tile = Tile::Normal, const Team team = Team::Neutral );
 
+        // Allow the use of copy constructor by reference.
+        Battlefield_Tile( const Battlefield_Tile& battlefield_tile ) : m_symbol(battlefield_tile.m_symbol), m_tile(battlefield_tile.m_tile), m_team(battlefield_tile.m_team) {}
+
+        // Disallow the use of copy constructor by pointer.
+        Battlefield_Tile( const Battlefield_Tile* battlefield_tile ) = delete;
+
+        // // Disallow the use of move constructor.
+        // Battlefield_Tile(Battlefield_Tile&& battlefield_tile) = delete;
+
+        // Destructor
         ~Battlefield_Tile();
         
-        char get_symbol() { return _symbol; }
+        char get_symbol() { return m_symbol; }
 
-        Tile get_tile() { return _tile; }
+        Tile get_tile() { return m_tile; }
 
-        Team get_team() { return _team; }
+        Team get_team() { return m_team; }
 
         // Returns 'true' if the tile can be reached by a creature stack.
         bool is_reachable();

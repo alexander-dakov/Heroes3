@@ -2,7 +2,9 @@
 #define SPELL_H
 
 #include <iostream>
-#include "../utilities/types.h"
+#include <cstdint>
+
+// #include "../utilities/types.h"
 #include "Skill_level.h"
 
 
@@ -35,35 +37,45 @@ class Spell
             };
 
       private:
-            std::string _name;
-            School_of_magic _school_of_magic;
-            Level _spell_level;
-            Skill_level _skill_level;
-            std::string _mana_cost;
-            Effect _effect;
-            std::string _description;
-            uint8_t _duration;
+            std::string m_name;
+            School_of_magic m_school_of_magic;
+            Level m_spell_level;
+            Skill_level m_skill_level;
+            std::string m_mana_cost;
+            Effect m_effect;
+            std::string m_description;
+            uint8_t m_duration;
 
       public:
-            Spell() {};
+            // Default constructor.
+            Spell() {}
 
-            ~Spell() {};
+            // Disallow the use of move constructor.
+            Spell(const Spell& spell) = delete;
+            Spell(const Spell* spell) = delete;
+
+            // Disallow the use of move constructor.
+            Spell(Spell&& spell) = delete;
+
+            // Destructor.
+            ~Spell() {}
             
-            std::string get_name() { return _name; };
+            // Getters.
+            std::string get_name() { return m_name; }
 
-            School_of_magic get_school_of_magic() { return _school_of_magic; };
+            School_of_magic get_school_of_magic() { return m_school_of_magic; }
 
-            Level get_spell_level() { return _spell_level; };
+            Level get_spell_level() { return m_spell_level; }
 
-            Skill_level get_skill_level() { return _skill_level; };
+            Skill_level get_skill_level() { return m_skill_level; }
 
-            std::string get_mana_cost() { return _mana_cost; };
+            std::string get_mana_cost() { return m_mana_cost; }
 
-            Effect get_effect() { return _effect; }; 
+            Effect get_effect() { return m_effect; } 
 
-            std::string get_description() { return _description; };
+            std::string get_description() { return m_description; }
 
-            uint8_t get_duration() { return _duration; };
+            uint8_t get_duration() { return m_duration; }
 };
 
 

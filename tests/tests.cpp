@@ -2,12 +2,13 @@
 
 void print_before_testing_output()
 {
+    // Flush the buffers and print a string to mark the beginning of the test.
     std::cout << std::endl << std::flush;
     std::cerr << std::endl << std::flush;
     printf( "=================== Welcome to the Heroes 3 testing grounds =================== \n" );
 }
 
-void print_some_special_abilities(Creature* c)
+void print_some_special_abilities(const Creature* const c)
 {
     printf( "\nLets see which of these special abilities the unit has.\n" );
     printf( "%s :\n", c->get_name().c_str() );
@@ -26,60 +27,66 @@ void print_some_special_abilities(Creature* c)
     printf( " - spell power : %d\n", c->get_spell_power());
 }
 
-void test_create_creature()
-{
-    print_before_testing_output();
+// void test_create_creature()
+// {
+//     print_before_testing_output();
 
-    std::string name = "Skellies";
-    Faction faction = Faction::Necropolis;
-    uint8_t level = 1;
-    auto upgrade = Creature::Upgrade_level::None;
-    uint8_t growth = 12;
-    bool needs_2_tiles_in_battle = false;
-    uint8_t att = 5;
-    uint8_t def = 4;
-    uint8_t shots = 20;
-    uint8_t min_dmg = 1;
-    uint8_t max_dmg = 3;
-    uint16_t hp = 6;
-    uint8_t speed = 4;
-    Morale morale = Morale::Neutral;
-    Luck luck = Luck::Neutral;
-    uint16_t fight_value = 75;
-    uint16_t ai_value = 60;
-    uint32_t gold = 60;
-    uint32_t mercury = 0;
-    uint32_t sulfur = 0; 
-    uint32_t crystal = 0;
-    uint32_t gems = 0;
-    std::string special_abilities = "Undead.";
+//     // Setup the new Creature object
+//     std::string name = "Skellies";
+//     Faction faction = Faction::Necropolis;
+//     uint8_t level = 1;
+//     auto upgrade = Creature::Upgrade_level::None;
+//     uint8_t growth = 12;
+//     bool needs_2_tiles_in_battle = false;
+//     uint8_t att = 5;
+//     uint8_t def = 4;
+//     uint8_t shots = 20;
+//     uint8_t min_dmg = 1;
+//     uint8_t max_dmg = 3;
+//     uint16_t hp = 6;
+//     uint8_t speed = 4;
+//     Morale morale = Morale::Neutral;
+//     Luck luck = Luck::Neutral;
+//     uint16_t fight_value = 75;
+//     uint16_t ai_value = 60;
+//     uint32_t gold = 60;
+//     uint32_t mercury = 0;
+//     uint32_t sulfur = 0; 
+//     uint32_t crystal = 0;
+//     uint32_t gems = 0;
+//     std::string special_abilities = "Undead.";
     
-    Creature Skellies ( name, faction, level, upgrade, growth, needs_2_tiles_in_battle,
-                        att, def, shots, min_dmg, max_dmg, hp, speed, morale, luck, fight_value, ai_value, 
-                        { gold, mercury, sulfur, crystal, gems }, 
-                        special_abilities );
+//     // Call the parametrized constructor
+//     Creature Skellies ( name, faction, level, upgrade, growth, needs_2_tiles_in_battle,
+//                         att, def, shots, min_dmg, max_dmg, hp, speed, morale, luck, fight_value, ai_value, 
+//                         { gold, mercury, sulfur, crystal, gems }, 
+//                         special_abilities );
+    
+//     // Check the way it looks
+//     Skellies.print_full_info();
 
-    Skellies.print_full_info();
+//     print_some_special_abilities(&Skellies);
 
-    print_some_special_abilities(&Skellies);
+//     // Create a reference and a pointer to the object, so copy constructors could be used
+//     Creature& ref = Skellies;
+//     Creature* ptr = &Skellies;
 
-    Creature& ref = Skellies;
-    Creature* ptr = &Skellies;
+//     // Create a copy by a reference and check if it is the same
+//     Creature Boney_Bois(ref);
+//     if( Boney_Bois != Skellies )
+//     {
+//         std::cerr << "Constructing by reference does not work!"<< std::endl;
+//         abort();
+//     }
 
-    Creature Boney_Bois(ref);
-    if( Boney_Bois.get_name() != Skellies.get_name() )
-    {
-        std::cerr << "Constructing by reference does not work!"<< std::endl;
-        abort();
-    }
-
-    Creature Calcium_Daddies(ptr);
-    if( Calcium_Daddies.get_name() != Skellies.get_name() )
-    {
-        std::cerr << "Constructing by pointer does not work!"<< std::endl;
-        abort();
-    }
-}
+//     // Create a copy by a pointer and check if it is the same
+//     Creature Calcium_Daddies(ptr);
+//     if( Calcium_Daddies != Skellies )
+//     {
+//         std::cerr << "Constructing by pointer does not work!"<< std::endl;
+//         abort();
+//     }
+// }
 
 void test_create_creature_stack()
 {
@@ -95,44 +102,6 @@ void test_create_creature_stack()
     printf( "\n" );
     army[0]->print_full_info();
     print_some_special_abilities(army[0]->get_creature());
-}
-
-// void test_creature_stack_vs_creature_stack()
-// {
-//     print_before_testing_output();
-
-//     // Stack attacker(Creature_List::Lich, 10, Team::Red);
-//     Stack attacker(Creature_List::Angel, 1, Team::Red);
-//     printf( "%s stack is comprised of : %d %s\n", attacker.get_team_as_string().c_str(), attacker.get_number(), attacker.get_creature_name().c_str() );
-
-//     Stack defender(Creature_List::Skeleton, 50, Team::Blue);
-//     // Stack defender(Creature_List::Ghost_Dragon, 1, Team::Blue);
-//     printf( "%s stack is comprised of : %d %s\n", defender.get_team_as_string().c_str(), defender.get_number(), defender.get_creature_name().c_str() );
-
-//     // TO DO : all special abilities have to be added in : attack(), defend(), recieve_damage()
-//     attacker.attack(&defender);
-
-//     defender.attack(&attacker);
-// }
-
-void test_create_item()
-{
-    print_before_testing_output();
-
-    std::string name = "BFG";
-    auto slot = Item::Slot::Weapon;
-    auto item_type = Item::Type::Relic;
-    uint32_t gold = 10000;
-    uint32_t mercury = 0;
-    uint32_t sulfur = 0; 
-    uint32_t crystal = 0;
-    uint32_t gems = 0;
-    Resources resources = {gold, mercury, sulfur, crystal, gems};
-    std::string effect = "Attack skill +12.";
-
-    Item BFG(name, slot, item_type, resources, effect);
-
-    BFG.print_full_info();
 }
 
 void test_create_hero()
@@ -326,56 +295,6 @@ void test_army_hero_bonuses()
             printf("\n");
         }
 }
-
-// void test_hero_vs_creature_stack()
-// {
-//     print_before_testing_output();
-
-//     Hero& hero = Hero_List::Crag_Hack; // should modify army
-    
-//     hero.set_attack(5);
-//     hero.set_defense(5);
-
-//     hero.equip_item(&Item_List::Ring_of_Vitality);  // unit hp +1
-//     hero.equip_item(&Item_List::Ring_of_Life);      // unit hp +1
-//     hero.equip_item(&Item_List::Vial_of_Lifeblood); // unit hp +2
-
-//     // hero.equip_item(&Item_List::Elixir_of_Life); // unit hp + 4 + 25% of base hp + regeneration per round
-
-//     hero.print_full_info();
-
-//     std::unique_ptr<Stack> attacker_ptr = nullptr;
-//     // attacker_ptr.reset( new Stack(Creature_List::Lich, 10, Team::Red) );
-//     // attacker_ptr.reset( new Stack(Creature_List::Angel, 1, Team::Red) );
-//     // attacker_ptr.reset( new Stack(Creature_List::Crusader, 5, Team::Red) );
-//     // attacker_ptr.reset( new Stack(Creature_List::Naga_Queen, 2, Team::Red) );
-//     // attacker_ptr.reset( new Stack(Creature_List::Ayssid, 2, Team::Red) );
-//     attacker_ptr.reset( new Stack(Creature_List::Nix, 2, Team::Red) );
-//     auto attacker = attacker_ptr.get();
-
-//     hero.add_stack_to_army(attacker_ptr);
-//     printf( "\nHero %s is leading the %s stack, comprised of : %d %s\n", hero.get_name().c_str(), attacker->get_team_as_string().c_str(), attacker->get_number(), attacker->get_creature_name().c_str() );
-//     attacker->print_full_info();
-
-//     // Stack defender(Creature_List::Skeleton, 20, Team::Blue);
-//     // Stack defender(Creature_List::Ghost_Dragon, 1, Team::Blue);
-//     // Stack defender(Creature_List::Wolf_Raider, 20, Team::Blue);
-//     // Stack defender(Creature_List::Royal_Griffin, 10, Team::Blue);
-//     Stack defender(Creature_List::Behemoth, 1, Team::Blue);
-
-//     printf( "\n%s stack is comprised of : %d %s\n", defender.get_team_as_string().c_str(), defender.get_number(), defender.get_creature_name().c_str() );
-//     defender.print_full_info();
-
-//     // TO DO : all special abilities have to be added in : attack(), defend(), recieve_damage()
-
-//     // to imitate a battle field, the troops must have positions
-//     attacker->set_position(0, 0);
-//     defender.set_position(1, 0);
-
-//     attacker->attack(&defender);
-
-//     defender.attack(attacker);
-// }
 
 void test_battle()
 {

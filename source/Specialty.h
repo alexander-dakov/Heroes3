@@ -2,20 +2,36 @@
 #define SPECIALTY_H
 
 #include <iostream>
-#include "../utilities/types.h"
+#include <cstdint>
+
+// #include "../utilities/types.h"
 
 
 struct Specialty
 {
       private:
-            std::string _name;
-            std::string _effect;
+            std::string m_name;
+            std::string m_effect;
 
       public:
-            Specialty(std::string name, std::string effect) : _name(name), _effect(effect) {};
+            // Disallow the use of default constructor.
+            Specialty() = delete;
 
-            std::string get_name()   { return _name;   };
-            std::string get_effect() { return _effect; };
+            // Parametrized constructor.
+            Specialty(std::string name, std::string effect) : m_name(name), m_effect(effect) {}
+
+            // Copy constructor by reference is used in Hero constructor.
+            Specialty(const Specialty& specialty) : m_name(specialty.m_name), m_effect(specialty.m_effect) {}
+
+            // Disallow the use of copy constructor by pointer.
+            Specialty(const Specialty* specialty) = delete;
+
+            // Disallow the use of move constructor.
+            Specialty(Specialty&& specialty) = delete;
+
+            // Getters.
+            std::string get_name()   { return m_name;   }
+            std::string get_effect() { return m_effect; }
 };
 
 #endif

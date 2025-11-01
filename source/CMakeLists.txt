@@ -1,3 +1,7 @@
+if (MSVC)
+    add_compile_options(/FS)
+endif()
+
 add_library(
     source
 

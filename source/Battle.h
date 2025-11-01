@@ -2,16 +2,18 @@
 #define BATTLE_H
 
 #include <iostream>
-#include <algorithm>
-#include <vector>
-#include <memory>
+#include <cstdint>
 #include <limits>
-#include "../utilities/types.h"
+#include <memory>
+#include <string>
+#include <vector>
+
+// #include "../utilities/types.h"
 #include "Battlefield_Tile.h"
-#include "Terrains.h"
 #include "Creature_Stack.h"
 #include "Hero.h"
-
+#include "Team.h"
+#include "Terrains.h"
 
 class Battle
 {
@@ -25,69 +27,84 @@ class Battle
         };
 
     private:
-        Hero& _attacker; // left side
-        Hero& _defender; // right side
+        Hero& m_attacker; // left side
+        Hero& m_defender; // right side
         
         // Defender may not have a hero. A possible solution is to create a new instance of a dummy/fake hero which will have no army bonuses. He will be there simply to 'carry' the army.
 
         Battlefield_Tile battlefield[Battlefield::WIDTH][Battlefield::LENGTH];
-        Format _format;
-        Terrain _terrain;
+        Format m_format;
+        Terrain m_terrain;
 
-        uint16_t _round = 0;
-        std::vector<Stack*> _turns;
-        std::vector<Stack*> _wait_turns;
+        uint16_t m_round = 0;
+        std::vector<Stack*> m_turns;
+        std::vector<Stack*> m_wait_turns;
         
         // A vector of pointers to stacks, to keep the corpses of perished stacks, so they could be resurrected.
-        std::vector<Stack*> _corpses = {nullptr};
+        std::vector<Stack*> m_corpses = {nullptr};
+
+        // An array to keep the reachable positions situated next to an army stack which is targeted.
+        Position m_positions_around_stack[8];
 
         // Boolean variable for items which affect the battle
-        bool _spirit_of_oppression_present = false;
-        bool _hourglass_of_evil_hour_present = false;
+        bool m_spirit_of_oppression_present = false;
+        bool m_hourglass_of_evil_hour_present = false;
 
         // Boolean variable for creatures which affect the battle
-        bool _angel_present        = false;
-        bool _necro_dragon_present = false;
-        bool _devil_present        = false;
-        bool _archdevil_present    = false;
-        bool _leprechaun_present   = false;
+        bool m_angel_present        = false;
+        bool m_necro_dragon_present = false;
+        bool m_devil_present        = false;
+        bool m_archdevil_present    = false;
+        bool m_leprechaun_present   = false;
+
+        Stack* find_present_stack( bool other_stack_is_on_battlefield, Stack* const my_stack, bool stacks_are_allies );
 
     public:
-        // no default or copy constructors allowed
+        // Disallow the use of default constructor.
+        Battle() = delete;
+
+        // Parametrized constructor, used upon starting a battle between two armies.
         Battle(Hero& attacker, Hero& defender, const Format format, const Terrain terrain); // constructing the battlefield, managing the event and then destroying the constructed objects 
 
+        // Disallow the use of copy constructors.
+        Battle(const Battle& battle) = delete;
+        Battle(const Battle* battle) = delete;
+
+        // Disallow the use of move constructor.
+        Battle(Battle&& battle) = delete;
+        
         ~Battle();
 
-        Hero* get_attacker() { return &_attacker;}
-        Hero* get_defender() { return &_defender;}
+        Hero* get_attacker() { return &m_attacker; }
+        Hero* get_defender() { return &m_defender; }
 
-        Format get_format() { return _format;  };
-        Terrain get_terrain()             { return _terrain; };
+        Format get_format()   { return m_format;  }
+        Terrain get_terrain() { return m_terrain; }
 
-        uint16_t get_round() { return _round; };
+        uint16_t get_round() { return m_round; }
 
-        std::vector<Stack*>* get_turns()       { return &_turns;   };
-        Stack* get_stack_turn(const uint8_t i) { return _turns[i]; };
+        std::vector<Stack*>* get_turns()       { return &m_turns;   }
+        Stack* get_stack_turn(const uint8_t i) { return m_turns[i]; }
 
-        std::vector<Stack*>* get_wait_turns()       { return &_wait_turns;   };
-        Stack* get_stack_wait_turn(const uint8_t i) { return _wait_turns[i]; };
+        std::vector<Stack*>* get_wait_turns()       { return &m_wait_turns;   }
+        Stack* get_stack_wait_turn(const uint8_t i) { return m_wait_turns[i]; }
 
-        std::vector<Stack*>* get_corpses() { return &_corpses; };
+        std::vector<Stack*>* get_corpses() { return &m_corpses; }
 
-        bool get_spirit_of_oppression_present()   { return _spirit_of_oppression_present;  };
-        bool get_hourglass_of_evil_hour_present() { return _hourglass_of_evil_hour_present; };
+        bool get_spirit_of_oppression_present()   { return m_spirit_of_oppression_present;  }
+        bool get_hourglass_of_evil_hour_present() { return m_hourglass_of_evil_hour_present; }
 
-        bool get_angel_present()        { return _angel_present;        };
-        bool get_necro_dragon_present() { return _necro_dragon_present; };
-        bool get_devil_present()        { return _devil_present;        };
-        bool get_archdevil_present()    { return _archdevil_present;    };
-        bool get_leprechaun_present()   { return _leprechaun_present;   };
+        bool get_angel_present()        { return m_angel_present;        }
+        bool get_necro_dragon_present() { return m_necro_dragon_present; }
+        bool get_devil_present()        { return m_devil_present;        }
+        bool get_archdevil_present()    { return m_archdevil_present;    }
+        bool get_leprechaun_present()   { return m_leprechaun_present;   }
 
-        bool get_has_angel_ally(Stack* const stack);
-        bool get_has_necro_dragon_enemy(Stack* const stack);
-        bool get_has_devil_enemy(Stack* const stack);
-        bool get_has_archdevil_enemy(Stack* const stack);
-        bool get_has_leprechaun_ally(Stack* const stack);
+        bool get_ally_has_angel(Stack* const stack);
+        bool get_enemy_has_necro_dragon(Stack* const stack);
+        bool get_enemy_has_devil(Stack* const stack);
+        bool get_enemy_has_archdevil(Stack* const stack);
+        bool get_ally_has_leprechaun(Stack* const stack);
         
         Position enter_battlefield_coordinates();
         
@@ -161,7 +178,7 @@ class Battle
         uint8_t get_distance_between_stacks(Stack* const stack, Stack* const enemy_stack);
 
         // Shows the coordinates of all surrounding tiles from which the defending stack can be attack, and the player picks one.
-        Position* select_location_around_enemy_stack(Stack* const stack, Stack* const enemy_stack);
+        void select_location_around_enemy_stack(Position& pos, Stack* const stack, Stack* const enemy_stack);
 
         Stack* find_existing_enemy_stack_via_symbol(const char ch, const Team team);
 
@@ -213,6 +230,7 @@ class Battle
         // Returns a pointer to the hero, to whose army the stack belongs.
         Hero* get_hero_of_stack(Stack* const stack);
 
+        // Checks if the battle has finished. Used before the beginning of every turn during a battle.
         bool check_battle_finished();
 };
 

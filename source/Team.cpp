@@ -1,57 +1,45 @@
 #include "Team.h"
 
+// Returns the int value of the color coresponding to the given team.
+uint8_t get_team_color(const Team team)
+{
+      uint8_t color = COLORS::WHITE; // default color for printing is white
+
+      switch (team)
+      {
+            case Team::Neutral : color = COLORS::WHITE;  break; // not used but written for programming purposes
+            case Team::Red     : color = COLORS::RED;    break;
+            case Team::Blue    : color = COLORS::BLUE;   break;
+            case Team::Tan     : color = COLORS::TAN;    break;
+            case Team::Green   : color = COLORS::GREEN;  break;
+            case Team::Orange  : color = COLORS::ORANGE; break;
+            case Team::Purple  : color = COLORS::PURPLE; break;
+            case Team::Teal    : color = COLORS::TEAL;   break;
+            case Team::Pink    : color = COLORS::PINK;   break;
+            default            : color = COLORS::WHITE;  break; // not used but written for programming purposes
+      }
+
+      return color;
+}
+
 // Prints a given character in the color coresponding to the team it refers.
 void print_colored_string(const char ch, const Team team)
 {
       HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE); // used for coloring output text
-      if( team != Team::Neutral ) // if the string refers to a team
-      {
-            uint8_t color = WHITE_COLOR;     
-            switch (team)
-            {
-                  case Team::Neutral : color = WHITE_COLOR; break; // not used but written for programming purposes
-                  case Team::Red     : color = 12; break;
-                  case Team::Blue    : color =  9; break;
-                  case Team::Tan     : color =  6; break;
-                  case Team::Green   : color = 10; break;
-                  case Team::Orange  : color =  8; break;
-                  case Team::Purple  : color =  5; break;
-                  case Team::Teal    : color = 11; break;
-                  case Team::Pink    : color = 13; break;
-            }
-            SetConsoleTextAttribute(hConsole, color);
-      }
-      else
-            SetConsoleTextAttribute(hConsole, WHITE_COLOR);
+      uint8_t color = get_team_color(team);
+      SetConsoleTextAttribute(hConsole, color);
 
       printf("%c", ch);
-      SetConsoleTextAttribute(hConsole, WHITE_COLOR); // to make sure the rest of the text is in white
+      SetConsoleTextAttribute(hConsole, COLORS::WHITE); // to make sure the rest of the text is in white
 }
 
 // Prints a given string in the color coresponding to the team it refers.
 void print_colored_string(const std::string str, const Team team)
 {
       HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE); // used for coloring output text
-      if( team != Team::Neutral ) // if the string refers to a team
-      {
-            uint8_t color = WHITE_COLOR;     
-            switch (team)
-            {
-                  case Team::Neutral : color = WHITE_COLOR; break; // not used but written for programming purposes
-                  case Team::Red     : color = 12; break;
-                  case Team::Blue    : color =  9; break;
-                  case Team::Tan     : color =  6; break;
-                  case Team::Green   : color = 10; break;
-                  case Team::Orange  : color =  8; break;
-                  case Team::Purple  : color =  5; break;
-                  case Team::Teal    : color = 11; break;
-                  case Team::Pink    : color = 13; break;
-            }
-            SetConsoleTextAttribute(hConsole, color);
-      }
-      else
-            SetConsoleTextAttribute(hConsole, WHITE_COLOR);
+      uint8_t color = get_team_color(team);
+      SetConsoleTextAttribute(hConsole, color);
 
       printf("%s", str.c_str());
-      SetConsoleTextAttribute(hConsole, WHITE_COLOR); // to make sure the rest of the text is in white
+      SetConsoleTextAttribute(hConsole, COLORS::WHITE); // to make sure the rest of the text is in white
 }

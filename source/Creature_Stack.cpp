@@ -1,23 +1,31 @@
+#define NOMINMAX
+
+#include <algorithm>
 #include "Creature_Stack.h"
 
-Stack::Stack(const Creature creature, const uint32_t number, const uint8_t pos_x, const uint8_t pos_y, const char battlefield_symbol, const Team team = Team::Neutral) :
-             _creature(creature), _number(number), _pos(pos_x, pos_y), _battlefield_symbol(battlefield_symbol), _team(team),
+Stack::Stack(const Creature* const creature, const uint32_t number, const uint8_t pos_x, const uint8_t pos_y, const char battlefield_symbol, const Team team = Team::Neutral) :
+             m_creature(creature), m_number(number), m_pos(pos_x, pos_y), m_battlefield_symbol(battlefield_symbol), m_team(team),
              battle_stats(creature)
              {};
 
-Stack::Stack(const Creature creature, const uint32_t number, const Team team = Team::Neutral) :
-             _creature(creature), _number(number), _team(team),
+Stack::Stack(const Creature* creature, const uint32_t number, const Team team = Team::Neutral) :
+             m_creature(creature), m_number(number), m_team(team),
              battle_stats(creature)
+             {};
+
+Stack::Stack(const Creature& creature, const uint32_t number, const Team team = Team::Neutral) :
+             m_creature(&creature), m_number(number), m_team(team),
+             battle_stats(&creature)
              {};
 
 Stack::Stack(const Stack& stack, const uint32_t number) :
-             _creature(stack._creature), _number(std::min(stack._number, number)), _team(stack._team),
-             battle_stats(stack._creature)
+             m_creature(stack.m_creature), m_number(std::min(stack.m_number, number)), m_team(stack.m_team),
+             battle_stats(stack.m_creature)
              {};
 
 Stack::Stack(const Stack* stack, const uint32_t number) :
-             _creature(stack->_creature), _number(std::min(stack->_number, number)), _team(stack->_team),
-             battle_stats(stack->_creature)
+             m_creature(stack->m_creature), m_number(std::min(stack->m_number, number)), m_team(stack->m_team),
+             battle_stats(stack->m_creature)
              {};
 
 Stack::~Stack()
@@ -46,27 +54,27 @@ std::string Stack::get_team_as_string()
 
 void Stack::reset_stats()
 {
-    battle_stats._att        = get_creature()->get_att();
-    battle_stats._def        = get_creature()->get_def();
-    battle_stats._shots_left = get_creature()->get_shots();
-    battle_stats._hp         = get_creature()->get_hp();
-    battle_stats._hp_left    = battle_stats._hp;
-    battle_stats._speed      = get_creature()->get_speed();
-    battle_stats._morale     = get_creature()->get_morale();
-    battle_stats._luck       = get_creature()->get_luck();
-    battle_stats._number_of_casts_left = get_creature()->get_number_of_casts();
+    battle_stats.m_att        = get_creature()->get_att();
+    battle_stats.m_def        = get_creature()->get_def();
+    battle_stats.m_shots_left = get_creature()->get_shots();
+    battle_stats.m_hp         = get_creature()->get_hp();
+    battle_stats.m_hp_left    = battle_stats.m_hp;
+    battle_stats.m_speed      = get_creature()->get_speed();
+    battle_stats.m_morale     = get_creature()->get_morale();
+    battle_stats.m_luck       = get_creature()->get_luck();
+    battle_stats.m_number_of_casts_left = get_creature()->get_number_of_casts();
 }
 
 void Stack::set_morale(const Morale morale) 
 { 
     if( ( !get_creature()->get_is_undead() && !get_creature()->get_is_bloodless() ) || ( *get_creature() == Creature_List::Stone_Gargoyle || *get_creature() == Creature_List::Obsidian_Gargoyle ) ) 
-        battle_stats._morale = morale; 
+        battle_stats.m_morale = morale; 
 }
 
 void Stack::add_morale(const Morale morale) 
 { 
     if( ( !get_creature()->get_is_undead() && !get_creature()->get_is_bloodless() ) || ( *get_creature() == Creature_List::Stone_Gargoyle || *get_creature() == Creature_List::Obsidian_Gargoyle ) ) 
-        battle_stats._morale = static_cast<Morale>( std::min( std::max( static_cast<int8_t>(battle_stats._morale) + static_cast<int8_t>(morale), -3), 3) ); 
+        battle_stats.m_morale = clamp_morale( battle_stats.m_morale + morale ); 
 }
 
 void Stack::recieve_damage(const uint32_t damage)

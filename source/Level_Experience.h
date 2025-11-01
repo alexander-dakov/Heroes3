@@ -2,12 +2,14 @@
 #define LEVEL_EXPERIENCE_H
 
 #include <iostream>
+#include <cstdint>
 #include <map>
-#include "../utilities/types.h"
+
+// #include "../utilities/types.h"
 
 namespace Level_Experience
 {
-    constexpr uint32_t MAX_EXPERIENCE = 1810034207;
+    const uint32_t MAX_EXPERIENCE = 1810034207;
 
     const std::map <uint8_t, uint32_t> lvl_to_exp = {
     {1,  0},

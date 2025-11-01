@@ -1,5 +1,7 @@
 #include <iostream>
-#include "../utilities/types.h"
+#include <cstdint>
+
+// #include "../utilities/types.h"
 
 #define SHOW_DAMAGE_INFO (0) // show(1) OR hide(0) damage messages
 
@@ -85,15 +87,14 @@ TO DO:
 
 int main()
 {
-    // test_create_creature();
+    
+    #if TESTS == 1
     // test_create_creature_stack();
-    // test_creature_stack_vs_creature_stack();
-    // test_create_item();
     // test_create_hero();
     // test_hero_item_bonuses();
     // test_army_hero_bonuses();
-    // test_hero_vs_creature_stack();
     test_battle();
+    #endif
 
     system("pause");
     return 0;
