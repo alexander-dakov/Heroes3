@@ -5,7 +5,6 @@
 #include <cstdint>
 #include <vector>
 
-// #include "../utilities/types.h"
 #include "Team.h"
 #include "Creature_Stack.h"
 
@@ -45,9 +44,6 @@ struct Battlefield_Tile
 
         // Allow the use of copy constructor by reference.
         Battlefield_Tile( const Battlefield_Tile& battlefield_tile ) : m_symbol(battlefield_tile.m_symbol), m_tile(battlefield_tile.m_tile), m_team(battlefield_tile.m_team) {}
-
-        // Disallow the use of copy constructor by pointer.
-        Battlefield_Tile( const Battlefield_Tile* battlefield_tile ) = delete;
 
         // // Disallow the use of move constructor.
         // Battlefield_Tile(Battlefield_Tile&& battlefield_tile) = delete;

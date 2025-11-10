@@ -1,3 +1,7 @@
+#include <iostream>
+#include <cstdint>
+#include <memory>
+
 #include "tests.h"
 
 void print_before_testing_output()
@@ -27,67 +31,6 @@ void print_some_special_abilities(const Creature* const c)
     printf( " - spell power : %d\n", c->get_spell_power());
 }
 
-// void test_create_creature()
-// {
-//     print_before_testing_output();
-
-//     // Setup the new Creature object
-//     std::string name = "Skellies";
-//     Faction faction = Faction::Necropolis;
-//     uint8_t level = 1;
-//     auto upgrade = Creature::Upgrade_level::None;
-//     uint8_t growth = 12;
-//     bool needs_2_tiles_in_battle = false;
-//     uint8_t att = 5;
-//     uint8_t def = 4;
-//     uint8_t shots = 20;
-//     uint8_t min_dmg = 1;
-//     uint8_t max_dmg = 3;
-//     uint16_t hp = 6;
-//     uint8_t speed = 4;
-//     Morale morale = Morale::Neutral;
-//     Luck luck = Luck::Neutral;
-//     uint16_t fight_value = 75;
-//     uint16_t ai_value = 60;
-//     uint32_t gold = 60;
-//     uint32_t mercury = 0;
-//     uint32_t sulfur = 0; 
-//     uint32_t crystal = 0;
-//     uint32_t gems = 0;
-//     std::string special_abilities = "Undead.";
-    
-//     // Call the parametrized constructor
-//     Creature Skellies ( name, faction, level, upgrade, growth, needs_2_tiles_in_battle,
-//                         att, def, shots, min_dmg, max_dmg, hp, speed, morale, luck, fight_value, ai_value, 
-//                         { gold, mercury, sulfur, crystal, gems }, 
-//                         special_abilities );
-    
-//     // Check the way it looks
-//     Skellies.print_full_info();
-
-//     print_some_special_abilities(&Skellies);
-
-//     // Create a reference and a pointer to the object, so copy constructors could be used
-//     Creature& ref = Skellies;
-//     Creature* ptr = &Skellies;
-
-//     // Create a copy by a reference and check if it is the same
-//     Creature Boney_Bois(ref);
-//     if( Boney_Bois != Skellies )
-//     {
-//         std::cerr << "Constructing by reference does not work!"<< std::endl;
-//         abort();
-//     }
-
-//     // Create a copy by a pointer and check if it is the same
-//     Creature Calcium_Daddies(ptr);
-//     if( Calcium_Daddies != Skellies )
-//     {
-//         std::cerr << "Constructing by pointer does not work!"<< std::endl;
-//         abort();
-//     }
-// }
-
 void test_create_creature_stack()
 {
     print_before_testing_output();
@@ -96,7 +39,7 @@ void test_create_creature_stack()
 
     for(int i = 0; i < Hero_slots::ARMY; i++)
     {
-        army[i] = std::unique_ptr<Stack>( new Stack(Creature_List::Master_Genie, 50 + i) );
+        army[i] = std::unique_ptr<Stack>( new Stack(Creature::get(Master_Genie), 50 + i) );
         printf( "Stack %d is comprised of : %d %s\n", i + 1, army[i]->get_number(), army[i]->get_creature()->get_name().c_str() );
     }
     printf( "\n" );
@@ -143,40 +86,40 @@ void test_hero_item_bonuses()
 {
     print_before_testing_output();
 
-    Hero& hero = Hero_List::Orrin; // second hero should modify army
+    Hero& hero = *Hero::get(Orrin); // second hero should modify army
 
     // Helmet
-    hero.pick_up_item(&Item_List::Helm_of_Heavenly_Enlightenment);    // primary +6
+    hero.pick_up_item(Item::get(Helm_of_Heavenly_Enlightenment));    // primary +6
 
     // Cape
-    // hero.pick_up_item(&Item_List::Dragon_Wing_Tabard);                // power +2, knowledge +2
+    // hero.pick_up_item(Item::get(Dragon_Wing_Tabard));                // power +2, knowledge +2
 
     // Necklace
-    // hero.pick_up_item(&Item_List::Necklace_of_Dragonteeth);           // power +3, knowledge +3
+    // hero.pick_up_item(Item::get(Necklace_of_Dragonteeth));           // power +3, knowledge +3
 
     // Weapon
-    hero.pick_up_item(&Item_List::Sword_of_Judgement);                // primary +5
+    hero.pick_up_item(Item::get(Sword_of_Judgement));                // primary +5
 
     // Shield
-    hero.pick_up_item(&Item_List::Sentinels_Shield);                  // defense +12, attack -3
+    hero.pick_up_item(Item::get(Sentinels_Shield));                  // defense +12, attack -3
 
     // Armor
-    hero.pick_up_item(&Item_List::Titans_Cuirass);                    // power +10, knowledge -2
+    hero.pick_up_item(Item::get(Titans_Cuirass));                    // power +10, knowledge -2
 
     // Hand
-    // hero.pick_up_item(&Item_List::Quiet_Eye_of_the_Dragon);           // attack +1, defense +1
-    // hero.pick_up_item(&Item_List::Equestrians_Gloves);                // movement points +200
+    // hero.pick_up_item(Item::get(Quiet_Eye_of_the_Dragon));           // attack +1, defense +1
+    // hero.pick_up_item(Item::get(Equestrians_Gloves));                // movement points +200
 
     // Boots
-    hero.pick_up_item(&Item_List::Sandals_of_the_Saint);              // primary +2
+    hero.pick_up_item(Item::get(Sandals_of_the_Saint));              // primary +2
 
     // Pocket
-    // hero.pick_up_item(&Item_List::Crest_of_Valor);                    // morale +1
-    // hero.pick_up_item(&Item_List::Cards_of_Prophecy);                 // luck +1
+    // hero.pick_up_item(Item::get(Crest_of_Valor));                    // morale +1
+    // hero.pick_up_item(Item::get(Cards_of_Prophecy));                 // luck +1
     
     hero.print_full_info();
 
-    hero.unequip_item(&Item_List::Helm_of_Heavenly_Enlightenment);    // primary +6
+    hero.unequip_item(Item::get(Helm_of_Heavenly_Enlightenment));    // primary +6
 
     hero.print_full_info();
 
@@ -194,59 +137,59 @@ void test_army_hero_bonuses()
 {
     print_before_testing_output();
 
-    Hero& first_hero  = Hero_List::None;  // should not modify army
-    Hero& second_hero = Hero_List::Orrin; // should modify army
+    Hero& first_hero  = *Hero::get(Dummy);  // should not modify army
+    Hero& second_hero = *Hero::get(Orrin); // should modify army
 
     first_hero.print_full_info();
     second_hero.print_full_info();
 
     // Helmet
-    second_hero.pick_up_item(&Item_List::Helm_of_Heavenly_Enlightenment);    // primary +6
+    second_hero.pick_up_item(Item::get(Helm_of_Heavenly_Enlightenment));    // primary +6
 
     // Cape
-    second_hero.pick_up_item(&Item_List::Cape_of_Velocity);                  // unit speed +2
+    second_hero.pick_up_item(Item::get(Cape_of_Velocity));                  // unit speed +2
 
     // Necklace
-    second_hero.pick_up_item(&Item_List::Necklace_of_Swiftness);             // unit speed +1
-    // second_hero.pick_up_item(&Item_List::Pendant_of_Courage);                // morale +3, luck +3
+    second_hero.pick_up_item(Item::get(Necklace_of_Swiftness));             // unit speed +1
+    // second_hero.pick_up_item(Item::get(Pendant_of_Courage));                // morale +3, luck +3
 
     // Weapon
-    second_hero.pick_up_item(&Item_List::Sword_of_Judgement);                // primary +5
+    second_hero.pick_up_item(Item::get(Sword_of_Judgement));                // primary +5
 
     // Shield
-    second_hero.pick_up_item(&Item_List::Sentinels_Shield);                  // defense +12, attack -3
+    second_hero.pick_up_item(Item::get(Sentinels_Shield));                  // defense +12, attack -3
 
     // Armor
-    second_hero.pick_up_item(&Item_List::Titans_Cuirass);                    // power +10, knowledge -2
+    second_hero.pick_up_item(Item::get(Titans_Cuirass));                    // power +10, knowledge -2
 
     // Hand
-    second_hero.pick_up_item(&Item_List::Ring_of_Wayfarer);                  // unit speed +1
-    // second_hero.pick_up_item(&Item_List::Ring_of_Vitality);               // unit hp +1
-    second_hero.pick_up_item(&Item_List::Ring_of_Life);                      // unit hp +1
+    second_hero.pick_up_item(Item::get(Ring_of_Wayfarer));                  // unit speed +1
+    // second_hero.pick_up_item(Item::get(Ring_of_Vitality));               // unit hp +1
+    second_hero.pick_up_item(Item::get(Ring_of_Life));                      // unit hp +1
 
     // Boots
-    second_hero.pick_up_item(&Item_List::Sandals_of_the_Saint);              // primary +2
+    second_hero.pick_up_item(Item::get(Sandals_of_the_Saint));              // primary +2
 
     // Pocket
-    second_hero.pick_up_item(&Item_List::Vial_of_Lifeblood);                 // unit hp +2
-    // second_hero.pick_up_item(&Item_List::Elixir_of_Life); // unit hp + 4 + 25% of base hp + regeneration per round
-    second_hero.pick_up_item(&Item_List::Badge_of_Courage);                  // morale +1
-    // second_hero.pick_up_item(&Item_List::Crest_of_Valor);                    // morale +1
-    second_hero.pick_up_item(&Item_List::Cards_of_Prophecy);                 // luck +1
+    second_hero.pick_up_item(Item::get(Vial_of_Lifeblood));                 // unit hp +2
+    // second_hero.pick_up_item(Item::get(Elixir_of_Life)); // unit hp + 4 + 25% of base hp + regeneration per round
+    second_hero.pick_up_item(Item::get(Badge_of_Courage));                  // morale +1
+    // second_hero.pick_up_item(Item::get(Crest_of_Valor));                    // morale +1
+    second_hero.pick_up_item(Item::get(Cards_of_Prophecy));                 // luck +1
 
-    second_hero.unequip_item(&Item_List::Helm_of_Heavenly_Enlightenment);    // primary +6
+    second_hero.unequip_item(Item::get(Helm_of_Heavenly_Enlightenment));    // primary +6
     
     second_hero.print_full_info();
 
     // fill an army
     std::array<std::unique_ptr<Stack>, Hero_slots::ARMY> army;
-    army[0].reset( new Stack(Creature_List::Master_Gremlin, 1) );
-    army[1].reset( new Stack(Creature_List::Stone_Gargoyle, 1) );
-    army[2].reset( new Stack(Creature_List::Dwarf, 1) );
-    army[3].reset( new Stack(Creature_List::Stone_Golem, 1) );
-    army[4].reset( new Stack(Creature_List::Pikeman, 1) );
-    army[5].reset( new Stack(Creature_List::Skeleton, 1) );
-    army[6].reset( new Stack(Creature_List::Magma_Elemental, 1) );
+    army[0].reset( new Stack(Creature::get(Master_Gremlin), 1) );
+    army[1].reset( new Stack(Creature::get(Stone_Gargoyle), 1) );
+    army[2].reset( new Stack(Creature::get(Dwarf), 1) );
+    army[3].reset( new Stack(Creature::get(Stone_Golem), 1) );
+    army[4].reset( new Stack(Creature::get(Pikeman), 1) );
+    army[5].reset( new Stack(Creature::get(Skeleton), 1) );
+    army[6].reset( new Stack(Creature::get(Magma_Elemental), 1) );
 
     for(int i = 0; i < Hero_slots::ARMY; i++)
         if( army[i] != nullptr )
@@ -274,7 +217,7 @@ void test_army_hero_bonuses()
         }
 
     // Hero equips an item to boost army
-    second_hero.equip_item_from_chest(&Item_List::Helm_of_Heavenly_Enlightenment);    // primary +6
+    second_hero.equip_item_from_chest(Item::get(Helm_of_Heavenly_Enlightenment));    // primary +6
     // Print stats of the army
     printf( "\nArmy lead by hero %s :\n", second_hero.get_name().c_str() );
     for(int i = 0; i < Hero_slots::ARMY; i++)
@@ -300,22 +243,21 @@ void test_battle()
 {
     print_before_testing_output();
 
-    Hero& red_hero = Hero_List::Him;
-    Hero& tan_hero = Hero_List::Her;
+    Hero& red_hero = *Hero::get(Him);
+    Hero& tan_hero = *Hero::get(Her);
 
     red_hero.print_full_info();
     tan_hero.print_full_info();
 
     // fill an army
     std::array<std::unique_ptr<Stack>, Hero_slots::ARMY> red_army;
-    red_army[0].reset( new Stack( Creature_List::Hobgoblin,      100, red_hero.get_team() ) );
-    red_army[1].reset( new Stack( Creature_List::Wolf_Raider,     50, red_hero.get_team() ) );
-    red_army[2].reset( new Stack( Creature_List::Orc_Chieftain,   25, red_hero.get_team() ) );
-    red_army[3].reset( new Stack( Creature_List::Ogre_Mage,       10, red_hero.get_team() ) );
-    red_army[4].reset( new Stack( Creature_List::Thunderbird,      5, red_hero.get_team() ) );
-    red_army[5].reset( new Stack( Creature_List::Cyclops_King,     2, red_hero.get_team() ) );
-    red_army[6].reset( new Stack( Creature_List::Ancient_Behemoth, 1, red_hero.get_team() ) );
-
+    red_army[0].reset( new Stack( Creature::get(Hobgoblin),      100, red_hero.get_team() ) );
+    red_army[1].reset( new Stack( Creature::get(Wolf_Raider),     50, red_hero.get_team() ) );
+    red_army[2].reset( new Stack( Creature::get(Orc_Chieftain),   25, red_hero.get_team() ) );
+    red_army[3].reset( new Stack( Creature::get(Ogre_Mage),       10, red_hero.get_team() ) );
+    red_army[4].reset( new Stack( Creature::get(Thunderbird),      5, red_hero.get_team() ) );
+    red_army[5].reset( new Stack( Creature::get(Cyclops_King),     2, red_hero.get_team() ) );
+    red_army[6].reset( new Stack( Creature::get(Ancient_Behemoth), 1, red_hero.get_team() ) );
     // Assign the army to the first hero
     for(int i = 0; i < Hero_slots::ARMY; i++)
         if( red_army[i] != nullptr )
@@ -323,13 +265,13 @@ void test_battle()
 
     // fill an army
     std::array<std::unique_ptr<Stack>, Hero_slots::ARMY> tan_army;
-    tan_army[0].reset( new Stack( Creature_List::Gnoll_Marauder,  100, tan_hero.get_team() ) );
-    tan_army[1].reset( new Stack( Creature_List::Lizard_Warrior,   50, tan_hero.get_team() ) );
-    tan_army[2].reset( new Stack( Creature_List::Dragon_Fly,       25, tan_hero.get_team() ) );
-    tan_army[3].reset( new Stack( Creature_List::Greater_Basilisk, 10, tan_hero.get_team() ) );
-    tan_army[4].reset( new Stack( Creature_List::Mighty_Gorgon,     5, tan_hero.get_team() ) );
-    tan_army[5].reset( new Stack( Creature_List::Wyvern_Monarch,    2, tan_hero.get_team() ) );
-    tan_army[6].reset( new Stack( Creature_List::Chaos_Hydra,       1, tan_hero.get_team() ) );
+    tan_army[0].reset( new Stack( Creature::get(Gnoll_Marauder),  100, tan_hero.get_team() ) );
+    tan_army[1].reset( new Stack( Creature::get(Lizard_Warrior),   50, tan_hero.get_team() ) );
+    tan_army[2].reset( new Stack( Creature::get(Dragon_Fly),       25, tan_hero.get_team() ) );
+    tan_army[3].reset( new Stack( Creature::get(Greater_Basilisk), 10, tan_hero.get_team() ) );
+    tan_army[4].reset( new Stack( Creature::get(Mighty_Gorgon),     5, tan_hero.get_team() ) );
+    tan_army[5].reset( new Stack( Creature::get(Wyvern_Monarch),    2, tan_hero.get_team() ) );
+    tan_army[6].reset( new Stack( Creature::get(Chaos_Hydra),       1, tan_hero.get_team() ) );
 
     // Assign the army to the second hero
     for(int i = 0; i < Hero_slots::ARMY; i++)

@@ -7,7 +7,6 @@
 #include <windows.h>
 #endif
 
-// #include "../utilities/types.h"
 
 namespace COLORS
 {

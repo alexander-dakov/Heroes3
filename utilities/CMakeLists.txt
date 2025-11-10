@@ -4,7 +4,7 @@ endif()
 
 add_library(
     utilities
-    types.h
+    user_macros.h
     )
 
 set_target_properties(utilities PROPERTIES LINKER_LANGUAGE CXX)

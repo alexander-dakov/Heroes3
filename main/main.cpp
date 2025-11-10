@@ -1,8 +1,6 @@
 #include <iostream>
 #include <cstdint>
 
-// #include "../utilities/types.h"
-
 #define SHOW_DAMAGE_INFO (0) // show(1) OR hide(0) damage messages
 
 #define ENABLE_DOUBLE_TILE_STACKS (0) // represent big creatures with 2 tiles(1) OR represent all creature stacks with 1 tile(0)
@@ -20,16 +18,16 @@
     2) New tests are added with ease and kept for future references.
 
 1. Creatures :
-    1) Creatures in the game are influenced by the hero leading them, if they have one. Thus they get to be treated as structures of data without setters, but with getters.
-    Methods are written in Creature.h.
-    2) A library of all in-game creatures, with their basic stats, is kept in a namespace called Creature_List, written in Creature_List.cpp. Creatures' special abilities are 
+    1) Creatures in the game are used to form creature/army stacks, which are influenced by the hero leading them, if they have one. Creatures get to be treated as structures of 
+    constant data without setters- only getters. Methods are written in Creature.h.
+    2) A library of all in-game creatures, with their basic stats, is kept in a map called Creature_List, written in Creature_List.cpp. Creatures' special abilities are
     derived from the string in the end of the constructor.
     3) One creature can have 2 upgrades. Some modes add second upgrade to other units as well. Thus the upgrade level for all creatures is set to hold 3 options - None, First, Second.
-    4) Creature stacks are the interactable objects forming the armies, used in battles, which COPY an instance of a creature from Creature_List. It should not be a reference or 
+    4) Creature stacks are the interactable objects forming the armies, used in battles, which COPY an instance of a creature from Creature_List. It should not be a reference or
     a pointer as the object will suffer changes and there may be many instances of the same creature in the game.
 
 2. Creature stacks :
-    1) Stacks are basically a group of creatures placed in one slot in armies and on battle field. They can hold up to 3 spell effects (buffs and debuffs) at the same time. 
+    1) Stacks are basically a group of creatures placed in one slot in armies and on battle field. They can hold up to 3 spell effects (buffs and debuffs) at the same time.
     If the stack is not part of a hero's army - the basic stats of the creatures will be used in battle.
     If the stack is part of a hero's army - the stack of creatures should get bonuses from the hero's primary and secondary skills, morale and luck, specialty and items.
     2) On the battle field, each stack has its own turn which may be skipped (if perished / lacks morale / under a certain spell). A flag should be used to help with the problem.
@@ -38,7 +36,7 @@
 
 3. Heroes :
     1) Heroes should be interactable objects that hold an army of up to 7 creature stacks.
-    2) A library of all in-game heroes, with in-game up-to-date stats, is kept in a namespace called Hero_List (created in Hero_List.cpp). Since a hero could exist only once 
+    2) A library of all in-game heroes, with in-game up-to-date stats, is kept in a map called Hero_List (created in Hero_List.cpp). Since a hero could exist only once
     in a game, they will be directly referenced for each player.
     3) Special abilities, secondary skills, items and war machines should aslo be treated as structs of data. All of them should have their own namespace of instances, which will
     be referenced by a hero.
@@ -56,12 +54,12 @@
     - Ammo Cart - gives ranged units unlimited ammo, while the cart is not destroyed.
     - Ballista / Cannon - shoots at an enemy stack in the beggining of the battle round.
     - Catapult - used only during sieges, it damages the enemy's fortress bringing down its walls and shooting towers. It can be destroyed in battle. Every gets one automatically.
-    2) They resemble creatures as they : have battle stats, can take damage, have spell immunities, cannot move or retaliate. Their aim/target could be altered by the hero if 
+    2) They resemble creatures as they : have battle stats, can take damage, have spell immunities, cannot move or retaliate. Their aim/target could be altered by the hero if
     her posseses certain secondary abilities.
     3) They are found in War_Machines_List.cpp
 
 7. Items :
-    1) Items are non-changeable structures of data. They are found in Items_List.cpp
+    1) Items are non-changeable structures of data. They are found in Item_List.cpp
     2) One item can be found multiple times in a game.
     3) Heroes hold a pointer to an item and if it is placed outside the treasure chest, the hero gets the bonus.
 
@@ -87,7 +85,6 @@ TO DO:
 
 int main()
 {
-    
     #if TESTS == 1
     // test_create_creature_stack();
     // test_create_hero();

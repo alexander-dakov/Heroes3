@@ -8,7 +8,6 @@
 #include <string>
 #include <vector>
 
-// #include "../utilities/types.h"
 #include "Battlefield_Tile.h"
 #include "Creature_Stack.h"
 #include "Hero.h"
@@ -26,10 +25,24 @@ class Battle
             Ships
         };
 
+        // Disallow the use of default constructor.
+        Battle() = delete;
+
+        // Parametrized constructor, used upon starting a battle between two armies.
+        Battle(Hero& attacker, Hero& defender, const Format format, const Terrain terrain); // constructing the battlefield, managing the event and then destroying the constructed objects
+
+        // Disallow the use of copy constructor.
+        Battle(const Battle& battle) = delete;
+
+        // Disallow the use of move constructor.
+        Battle(Battle&& battle) = delete;
+
+        ~Battle();
+
     private:
         Hero& m_attacker; // left side
         Hero& m_defender; // right side
-        
+
         // Defender may not have a hero. A possible solution is to create a new instance of a dummy/fake hero which will have no army bonuses. He will be there simply to 'carry' the army.
 
         Battlefield_Tile battlefield[Battlefield::WIDTH][Battlefield::LENGTH];
@@ -39,7 +52,7 @@ class Battle
         uint16_t m_round = 0;
         std::vector<Stack*> m_turns;
         std::vector<Stack*> m_wait_turns;
-        
+
         // A vector of pointers to stacks, to keep the corpses of perished stacks, so they could be resurrected.
         std::vector<Stack*> m_corpses = {nullptr};
 
@@ -60,21 +73,6 @@ class Battle
         Stack* find_present_stack( bool other_stack_is_on_battlefield, Stack* const my_stack, bool stacks_are_allies );
 
     public:
-        // Disallow the use of default constructor.
-        Battle() = delete;
-
-        // Parametrized constructor, used upon starting a battle between two armies.
-        Battle(Hero& attacker, Hero& defender, const Format format, const Terrain terrain); // constructing the battlefield, managing the event and then destroying the constructed objects 
-
-        // Disallow the use of copy constructors.
-        Battle(const Battle& battle) = delete;
-        Battle(const Battle* battle) = delete;
-
-        // Disallow the use of move constructor.
-        Battle(Battle&& battle) = delete;
-        
-        ~Battle();
-
         Hero* get_attacker() { return &m_attacker; }
         Hero* get_defender() { return &m_defender; }
 
@@ -105,9 +103,9 @@ class Battle
         bool get_enemy_has_devil(Stack* const stack);
         bool get_enemy_has_archdevil(Stack* const stack);
         bool get_ally_has_leprechaun(Stack* const stack);
-        
+
         Position enter_battlefield_coordinates();
-        
+
         void check_valid_battlefield_pos(const uint8_t x, const uint8_t y);
 
         void set_battlefield_pos(const uint8_t x, const uint8_t y, const Battlefield_Tile::Tile tile = Battlefield_Tile::Tile::Normal, const Team team = Team::Neutral, const char ch = Battlefield::ARMY_CHAR);
@@ -115,13 +113,13 @@ class Battle
 
         void set_battlefield_pos(const Position pos, const Battlefield_Tile::Tile tile = Battlefield_Tile::Tile::Normal, const Team team = Team::Neutral, const char ch = Battlefield::ARMY_CHAR);
         char get_battlefield_pos(const Position pos);
-        
+
         // Places a stack on the battlefield if the tile is free and reachable and changes the tile's team.
         void place_stack_on_battlefield(Stack* stack, const char ch);
 
         // Sets stack's position (private member) and copies it to the battlefield.
         void position_armies();
-        
+
         // Populate the battlefield with tiles, set up the unreachable tiles according to the format of the battle and position the armies.
         void set_up_battlefield();
 
@@ -136,7 +134,7 @@ class Battle
 
         // Populate the turns with pointers to army stacks and order them according to the fastest units on the battlefield. It is used only before the first round.
         void set_up_initial_turns();
-        
+
         // Orders the stacks that allready exist in the turn vector. It is used before the begining of every round after the first one.
         void set_up_normal_turns();
 
@@ -174,7 +172,7 @@ class Battle
 
         // Returns 'true' if a tile next to an enemy can be occupied by the stack and is located within the stack's reach.
         bool enemy_is_reachable(Stack* const stack, Stack* const enemy_stack);
-        
+
         uint8_t get_distance_between_stacks(Stack* const stack, Stack* const enemy_stack);
 
         // Shows the coordinates of all surrounding tiles from which the defending stack can be attack, and the player picks one.
@@ -220,7 +218,7 @@ class Battle
 
         // Calls inflict_damage() if stack can retaliate.
         void retaliate(Stack* const attacking_stack, Stack* defending_stack);
-        
+
         // Adds the stack to the corpses vector and removes it from the battlefield.
         void upon_stack_death(Stack* stack);
 

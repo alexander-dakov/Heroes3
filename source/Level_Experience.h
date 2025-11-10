@@ -5,8 +5,6 @@
 #include <cstdint>
 #include <map>
 
-// #include "../utilities/types.h"
-
 namespace Level_Experience
 {
     const uint32_t MAX_EXPERIENCE = 1810034207;

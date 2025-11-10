@@ -67,13 +67,13 @@ void Stack::reset_stats()
 
 void Stack::set_morale(const Morale morale) 
 { 
-    if( ( !get_creature()->get_is_undead() && !get_creature()->get_is_bloodless() ) || ( *get_creature() == Creature_List::Stone_Gargoyle || *get_creature() == Creature_List::Obsidian_Gargoyle ) ) 
+    if( ( !get_creature()->get_is_undead() && !get_creature()->get_is_bloodless() ) || ( get_creature() == Creature::get(Stone_Gargoyle) || get_creature() == Creature::get(Obsidian_Gargoyle) ) ) 
         battle_stats.m_morale = morale; 
 }
 
 void Stack::add_morale(const Morale morale) 
 { 
-    if( ( !get_creature()->get_is_undead() && !get_creature()->get_is_bloodless() ) || ( *get_creature() == Creature_List::Stone_Gargoyle || *get_creature() == Creature_List::Obsidian_Gargoyle ) ) 
+    if( ( !get_creature()->get_is_undead() && !get_creature()->get_is_bloodless() ) || ( get_creature() == Creature::get(Stone_Gargoyle) || get_creature() == Creature::get(Obsidian_Gargoyle) ) ) 
         battle_stats.m_morale = clamp_morale( battle_stats.m_morale + morale ); 
 }
 

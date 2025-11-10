@@ -10,8 +10,6 @@
 #undef max
 #include <algorithm> // for std::min() and std::max()
 
-// #include "../utilities/types.h"
-
 // Morale and Luck in the game are used in similar ways and hold similar values, but are used for different purposes. To segregate them from one another, lets use separate enums and methods.
 // How likely is for stack of troops to take initiative during its turn in battle
 enum class Morale

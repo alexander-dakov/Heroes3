@@ -4,11 +4,9 @@
 #include <iostream>
 #include <cstdint>
 
-// #include "../utilities/types.h"
 #include "Team.h"
 #include "Creature.h"
 #include "Position.h"
-#include "Creature_List.cpp"
 
 // TO DO :
 // get hero's special abilities form creature and place in creature_stack
@@ -97,9 +95,8 @@ class Stack
         // Parametrized constructor, used when moving a stack from one army to another or seperating it into smaller stacks.
         Stack(const Stack* stack, const uint32_t number);
 
-        // Disallow the use of copy constructors.
+        // Disallow the use of copy constructor.
         Stack(const Stack& stack) = delete;
-        Stack(const Stack* stack) = delete;
         
         // Disallow the use of move constructor.
         Stack(Stack&& stack) = delete;

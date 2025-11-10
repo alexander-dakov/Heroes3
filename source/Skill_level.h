@@ -4,10 +4,10 @@
 // level for each secondary skill
 enum Skill_level
 {
-      None, // for coding reasons
-      Basic,
-      Advanced,
-      Expert
+    None, // for coding reasons
+    Basic,
+    Advanced,
+    Expert
 };
 
 #endif
