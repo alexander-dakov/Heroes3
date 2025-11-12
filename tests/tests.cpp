@@ -47,41 +47,6 @@ void test_create_creature_stack()
     print_some_special_abilities(army[0]->get_creature());
 }
 
-void test_create_hero()
-{
-    print_before_testing_output();
-
-    std::string name = "Orrinman";
-    auto gender = Hero::Gender::Male;
-    auto hero_role = Hero::Role::Might;
-    Faction faction = Faction::Castle;
-    Team team = Team::Red;
-    uint8_t level = 1;
-    uint32_t experience = 0;
-    uint8_t attack = 2;
-    uint8_t defense = 2;
-    uint8_t power = 1;
-    uint8_t knowledge = 1;
-    Specialty& specialty = Specialty_List::Archery;
-    Morale morale = Morale::Neutral;
-    Luck luck = Luck::Neutral;
-    bool has_first_aid = false;
-    bool has_ammo_cart = false;
-    bool has_ballista = false;
-    bool has_catapult = false;
-    bool has_spellbook = false;
-
-    Hero Orrinman( name, gender, hero_role, faction, team, level, experience, 
-        attack, defense, power, knowledge,
-        specialty,
-        morale, luck,
-        // secondary skills
-        { has_first_aid, has_ammo_cart, has_ballista, has_catapult },
-        has_spellbook );
-
-    Orrinman.print_full_info();
-}
-
 void test_hero_item_bonuses()
 {
     print_before_testing_output();

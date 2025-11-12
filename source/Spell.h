@@ -45,9 +45,9 @@ class Spell
         std::string m_description;
         uint8_t m_duration;
 
-    public:
+    private:
         // Default constructor.
-        Spell() {}
+        Spell() = delete;
 
         // Disallow the use of copy constructor.
         Spell(const Spell& spell) = delete;
@@ -58,22 +58,23 @@ class Spell
         // Destructor.
         ~Spell() {}
         
+    public:
         // Getters.
-        std::string get_name() { return m_name; }
+        std::string get_name() const { return m_name; }
 
-        School_of_magic get_school_of_magic() { return m_school_of_magic; }
+        School_of_magic get_school_of_magic() const { return m_school_of_magic; }
 
-        Level get_spell_level() { return m_spell_level; }
+        Level get_spell_level() const { return m_spell_level; }
 
-        Skill_level get_skill_level() { return m_skill_level; }
+        Skill_level get_skill_level() const { return m_skill_level; }
 
-        std::string get_mana_cost() { return m_mana_cost; }
+        std::string get_mana_cost() const { return m_mana_cost; }
 
-        Effect get_effect() { return m_effect; } 
+        Effect get_effect() const { return m_effect; } 
 
-        std::string get_description() { return m_description; }
+        std::string get_description() const { return m_description; }
 
-        uint8_t get_duration() { return m_duration; }
+        uint8_t get_duration() const { return m_duration; }
 };
 
 

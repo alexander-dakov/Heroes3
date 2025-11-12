@@ -1,7 +1,6 @@
 #ifndef MORALE_LUCK_H
 #define MORALE_LUCK_H
 
-// #define NOMINMAX
 #include <cstdint>
 #ifdef _WIN32
 #include <windows.h>

@@ -70,9 +70,8 @@ class Battle
         bool m_archdevil_present    = false;
         bool m_leprechaun_present   = false;
 
-        Stack* find_present_stack( bool other_stack_is_on_battlefield, Stack* const my_stack, bool stacks_are_allies );
 
-    public:
+    private:
         Hero* get_attacker() { return &m_attacker; }
         Hero* get_defender() { return &m_defender; }
 
@@ -89,6 +88,8 @@ class Battle
 
         std::vector<Stack*>* get_corpses() { return &m_corpses; }
 
+        Stack* find_present_stack( bool other_stack_is_on_battlefield, Stack* const my_stack, bool stacks_are_allies );
+        
         bool get_spirit_of_oppression_present()   { return m_spirit_of_oppression_present;  }
         bool get_hourglass_of_evil_hour_present() { return m_hourglass_of_evil_hour_present; }
 

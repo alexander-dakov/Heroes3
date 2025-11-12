@@ -109,6 +109,7 @@ class Stack
 
         const Creature* const get_creature() { return m_creature; }
 
+        const CreatureType get_creature_type() { return get_creature()->get_type(); }       // for ease of code writing
         const std::string get_creature_name() { return get_creature()->get_name(); }        // for ease of code writing
         const Faction get_faction() { return get_creature()->get_faction(); }               // for ease of code writing
         const Terrain get_native_terrain() { return get_creature()->get_native_terrain(); } // for ease of code writing

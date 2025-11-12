@@ -1,4 +1,3 @@
-#include <thread>
 #define NOMINMAX
 #include <algorithm>
 #include <cstdint>

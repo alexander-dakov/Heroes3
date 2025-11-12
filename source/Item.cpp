@@ -3,25 +3,27 @@
 
 uint8_t Item::created_items = 0;
 
-Item::Item( const std::string& name, const Slot slot, const Type item_type, const Resources resources, const std::string& effect ) :
-            m_name(name), m_slot(slot), m_item_type(item_type), cost(resources), effects(effect)
+Item::Item( const Artifact artifact, const Slot slot, const Type item_type, const Resources& resources, const std::string& effect ) :
+            m_artifact(artifact), m_slot(slot), m_item_type(item_type), cost(resources), effects(effect)
 {
-      effects.fill_effects();
+    set_name_from_enum();
 
-      switch( get_type() )
-      {
+    effects.fill_effects();
+
+    switch( get_type() )
+    {
         case Type::Treasure : m_ai_value =  2000; break;
         case Type::Minor    : m_ai_value =  5000; break;
         case Type::Major    : m_ai_value = 10000; break;
         case Type::Relic    : m_ai_value = 20000; break;
-      }
+    }
 
-      created_items++;
+    created_items++;
 
-      // printf( "Item '%s' created.\n", get_name().c_str() );
+    // printf( "Item '%s' created.\n", get_name().c_str() );
 }
 
-Item::Item( Spell& spellscroll, const Resources resources ) :
+Item::Item( const Spell& spellscroll, const Resources& resources ) :
             m_name(spellscroll.get_name().c_str()), m_slot(Slot::Pocket), effects(spellscroll.get_description().c_str()), cost(resources)
 {
     ASSERT( get_type() != Type::None, "All spellscrolls must have type 'None'! Check up Item_List.cpp!" );
@@ -50,6 +52,87 @@ Item::Item( Spell& spellscroll, const Resources resources ) :
 Item::~Item()
 {
     // printf( "Item '%s' destroyed!\n", get_name().c_str() );
+}
+
+void Item::set_name_from_enum()
+{
+    switch( this->m_artifact )
+    {
+        // Helmet
+        case Artifact::Helm_of_Heavenly_Enlightenment : m_name = "Helm_of_Heavenly_Enlightenment"; break;
+
+        // Cape
+        case Artifact::Cape_of_Velocity : m_name = "Cape_of_Velocity"; break;
+
+        // Necklace
+        case Artifact::Celestial_Necklace_of_Bliss : m_name = "Celestial_Necklace_of_Bliss"; break;
+        case Artifact::Necklace_of_Swiftness       : m_name = "Necklace_of_Swiftness";       break;
+        case Artifact::Pendant_of_Courage          : m_name = "Pendant_of_Courage";          break;
+
+        // Weapon
+        case Artifact::Sword_of_Judgement            : m_name = "Sword_of_Judgement";            break;
+        case Artifact::Angelic_Alliance              : m_name = "Angelic_Alliance";              break;
+        case Artifact::Centaurs_Axe                  : m_name = "Centaurs_Axe";                  break;
+        case Artifact::Red_Dragon_Flame_Tongue       : m_name = "Red_Dragon_Flame_Tongue";       break;
+        case Artifact::Blackshard_of_the_Dead_Knight : m_name = "Blackshard_of_the_Dead_Knight"; break;
+        case Artifact::Armageddons_Blade             : m_name = "Armageddons_Blade";             break;
+        case Artifact::Greater_Gnolls_Flail          : m_name = "Greater_Gnolls_Flail";          break;
+        case Artifact::Ogres_Club_of_Havoc           : m_name = "Ogres_Club_of_Havoc";           break;
+        case Artifact::Sword_of_Hellfire             : m_name = "Sword_of_Hellfire";             break;
+        case Artifact::Trident_of_Dominion           : m_name = "Trident_of_Dominion";           break;
+        case Artifact::Titans_Gladius                : m_name = "Titans_Gladius";                break;
+
+        // Shield
+        case Artifact::Lions_Shield_of_Courage     : m_name = "Lions_Shield_of_Courage";     break;
+        case Artifact::Dragon_Scale_Shield         : m_name = "Dragon_Scale_Shield";         break;
+        case Artifact::Shield_of_the_Dwarven_Lords : m_name = "Shield_of_the_Dwarven_Lords"; break;
+        case Artifact::Shield_of_the_Yawning_Dead  : m_name = "Shield_of_the_Yawning_Dead";  break;
+        case Artifact::Buckler_of_the_Gnoll_King   : m_name = "Buckler_of_the_Gnoll_King";   break;
+        case Artifact::Targ_of_the_Rampaging_Ogre  : m_name = "Targ_of_the_Rampaging_Ogre";  break;
+        case Artifact::Shield_of_the_Damned        : m_name = "Shield_of_the_Damned";        break;
+        case Artifact::Shield_of_Naval_Glory       : m_name = "Shield_of_Naval_Glory";       break;
+        case Artifact::Sentinels_Shield            : m_name = "Sentinels_Shield";            break;
+
+        // Armor
+        case Artifact::Armor_of_Wonder                : m_name = "Armor_of_Wonder";                break;
+        case Artifact::Dragon_Scale_Armor             : m_name = "Dragon_Scale_Armor";             break;
+        case Artifact::Plate_of_Dying_Light           : m_name = "Plate_of_Dying_Light";           break;
+        case Artifact::Breastplate_of_Petrified_Wood  : m_name = "Breastplate_of_Petrified_Wood";  break;
+        case Artifact::Rib_Cage                       : m_name = "Rib_Cage";                       break;
+        case Artifact::Scales_of_the_Greater_Basilisk : m_name = "Scales_of_the_Greater_Basilisk"; break;
+        case Artifact::Tunic_of_the_Cyclops_King      : m_name = "Tunic_of_the_Cyclops_King";      break;
+        case Artifact::Breastplate_of_Brimstone       : m_name = "Breastplate_of_Brimstone";       break;
+        case Artifact::Royal_Armor_of_Nix             : m_name = "Royal_Armor_of_Nix";             break;
+        case Artifact::Titans_Cuirass                 : m_name = "Titans_Cuirass";                 break;
+
+        // Hand
+        case Artifact::Quiet_Eye_of_the_Dragon : m_name = "Quiet_Eye_of_the_Dragon"; break;
+        case Artifact::Ring_of_Vitality        : m_name = "Ring_of_Vitality";        break;
+        case Artifact::Ring_of_Life            : m_name = "Ring_of_Life";            break;
+        case Artifact::Ring_of_Wayfarer        : m_name = "Ring_of_Wayfarer";        break;
+        case Artifact::Still_Eye_of_the_Dragon : m_name = "Still_Eye_of_the_Dragon"; break;
+        case Artifact::Ring_of_Suppression     : m_name = "Ring_of_Suppression";     break;
+
+        // Boots
+        case Artifact::Sandals_of_the_Saint : m_name = "Sandals_of_the_Saint"; break;
+
+        // Pocket
+        case Artifact::Vial_of_Lifeblood          : m_name = "Vial_of_Lifeblood";          break;
+        case Artifact::Elixir_of_Life             : m_name = "Elixir_of_Life";             break;
+        case Artifact::Badge_of_Courage           : m_name = "Badge_of_Courage";           break;
+        case Artifact::Crest_of_Valor             : m_name = "Crest_of_Valor";             break;
+        case Artifact::Glyph_of_Gallantry         : m_name = "Glyph_of_Gallantry";         break;
+        case Artifact::Hideous_Mask               : m_name = "Hideous_Mask";               break;
+        case Artifact::Pendant_of_Downfall        : m_name = "Pendant_of_Downfall";        break;
+        case Artifact::Spirit_of_Oppression       : m_name = "Spirit_of_Oppression";       break;
+        case Artifact::Cards_of_Prophecy          : m_name = "Cards_of_Prophecy";          break;
+        case Artifact::Clover_of_Fortune          : m_name = "Clover_of_Fortune";          break;
+        case Artifact::Ladybird_of_Luck           : m_name = "Ladybird_of_Luck";           break;
+        case Artifact::Runes_of_Imminency         : m_name = "Runes_of_Imminency";         break;
+        case Artifact::Demons_Horseshoe           : m_name = "Demons_Horseshoe";           break;
+        case Artifact::Shamans_Puppet             : m_name = "Shamans_Puppet";             break;
+        case Artifact::Hourglass_of_the_Evil_Hour : m_name = "Hourglass_of_the_Evil_Hour"; break;
+    }
 }
 
 std::map< std::string, std::vector<bool*> > Item::effects::create_map_of_all_effects()

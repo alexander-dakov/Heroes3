@@ -16,7 +16,7 @@ namespace
     const uint8_t MAX_NUM_OF_EFFECTS = 10; // used to catch inaccuracies when constructing objects in Item_List.cpp
 }
 
-enum Artifact
+enum Artifact : uint8_t
 {
     // Helmet
     Helm_of_Heavenly_Enlightenment,
@@ -72,14 +72,15 @@ struct Item
             Relic
         };
 
+    private:
         // Disallow the use of default constructor.
         Item() = delete;
 
         // Parametrized constructor (no default constructor allowed) for every item besides spellscrolls.
-        Item( const std::string& name, const Slot slot, const Type item_type, const Resources resources, const std::string& effect );
+        Item( const Artifact artifact, const Slot slot, const Type item_type, const Resources& resources, const std::string& effect );
 
         // Constructor for spellscrolls.
-        Item( Spell& spellscroll, const Resources resources );
+        Item( const Spell& spellscroll, const Resources& resources );
 
         // Disallow the use of copy constructor.
         Item(const Item& item) = delete;
@@ -90,6 +91,9 @@ struct Item
         ~Item();
 
     private:
+        // Set the name of the item when constructing.
+        void set_name_from_enum();
+
         // Create all items in the game, using the private constructor. Add them to a static constant map.
         static const std::map<Artifact, const Item*>& create_and_fill_items_list();
         // Use a counter to keep track if the map containing all Item objects is incomplete.
@@ -100,6 +104,7 @@ struct Item
         static const Item* get(const Artifact artifact) { return create_and_fill_items_list().at(artifact); }
 
     private:
+        Artifact m_artifact;
         std::string m_name;
         Slot m_slot;
         Type m_item_type;
@@ -229,7 +234,7 @@ struct Item
             uint16_t m_gems     = 0;
 
             // Constructs a private structure containing data used when purchasing an item
-            cost( const Resources resources ) : m_gold(resources.Gold), m_mercury(resources.Mercury), m_sulfur(resources.Sulfur), m_crystals(resources.Crystals), m_gems(resources.Gems)
+            cost( const Resources& resources ) : m_gold(resources.Gold), m_mercury(resources.Mercury), m_sulfur(resources.Sulfur), m_crystals(resources.Crystals), m_gems(resources.Gems)
             {};
         }cost;
 

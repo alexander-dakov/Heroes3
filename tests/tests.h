@@ -16,9 +16,6 @@ void print_some_special_abilities(const Creature* const c);
 // Constructs enough different instances of class Stack to fill all of the hero's army slots.
 void test_create_creature_stack();
 
-// Constructs an instance of class Hero.
-void test_create_hero();
-
 // Checks if hero's stats get hero bonuses when : hero levels up / gets updated morale and luck / equips an item / unequips an item.
 void test_hero_item_bonuses();
 

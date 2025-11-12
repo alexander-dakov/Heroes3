@@ -12,11 +12,7 @@
 #include "Morale_Luck.h"
 #include "Resources.h"
 
-// TODO: Disable all constructors but the parametrized. Make it private.
-// TODO: Make an enum2str function which will be called in the constructor.
-// TODO: Make the operators check the enum field, instead of come parameters.
-// TODO: Change the constructor to accept the enum instead of string.
-enum CreatureType
+enum CreatureType : uint8_t
 {
     // Castle
     Pikeman, Halberdier, Archer, Marksman, Griffin, Royal_Griffin, Swordsman, Crusader, Monk, Zealot, Cavalier, Champion, Angel, Archangel,
@@ -89,10 +85,10 @@ struct Creature
         Creature() = delete;
 
         // Parametrized constructor. Calls Logical_Limitations_When_Constructing().
-        Creature( const std::string& name, const Faction faction, const uint8_t level, const Upgrade_level upgrade, const uint8_t growth, const bool needs_2_tiles_in_battle,
-                const uint8_t att, const uint8_t def, const uint8_t shots, const uint8_t min_dmg, const uint8_t max_dmg, const uint16_t hp, const uint8_t speed, const Morale morale, const Luck luck, const uint16_t fight_value, const uint32_t ai_value,
-                const Resources& resources,
-                const std::string& abilities );
+        Creature( const CreatureType type, const Faction faction, const uint8_t level, const Upgrade_level upgrade, const uint8_t growth, const bool needs_2_tiles_in_battle,
+                  const uint8_t att, const uint8_t def, const uint8_t shots, const uint8_t min_dmg, const uint8_t max_dmg, const uint16_t hp, const uint8_t speed, const Morale morale, const Luck luck, const uint16_t fight_value, const uint32_t ai_value,
+                  const Resources& resources,
+                  const std::string& abilities );
 
         // Disallow the use of copy constructor by reference.
         Creature(const Creature& creature) = delete;
@@ -105,10 +101,13 @@ struct Creature
 
     public:
         // It would be quicker to compare creatures by their faction, level and upgrade, rather than by their names (string).
-        bool operator==(const Creature& other) const { return ( get_faction() == other.get_faction() ) && ( get_level() == other.get_level() ) && ( get_upgrade() == other.get_upgrade() ); }
-        bool operator!=(const Creature& other) const { return ( get_faction() != other.get_faction() ) || ( get_level() != other.get_level() ) || ( get_upgrade() != other.get_upgrade() ); }
+        bool operator==(const Creature& other) const { return get_type() == other.get_type(); }
+        bool operator!=(const Creature& other) const { return get_type() != other.get_type(); }
 
     private:
+        // Straight-forward logical limits that need to be set when constructing.
+        void logical_limitations();
+
         // Create all creatures in the game, using the private constructor. Add them to a static constant map.
         static const std::map<CreatureType, const Creature*>& create_and_fill_creatures_list();
         // Use a counter to keep track if the map containing all Creature objects is incomplete.
@@ -121,6 +120,7 @@ struct Creature
     private:
         struct unit_info
         {
+            CreatureType m_type;
             std::string m_name;
             Faction m_faction;
             Terrain m_native_terrain;
@@ -129,13 +129,16 @@ struct Creature
             uint8_t m_growth;
             bool m_needs_2_tiles_in_battle;
 
+            // Set the name of the creature when constructing.
+            void set_name_from_enum();
+
             // Sets the native terrain of a creature, according to its faction.
             void set_native_terrain();
 
             // Constructs a private structure containing data used for overview
-            unit_info( std::string name, Faction faction, uint8_t level, Upgrade_level upgrade, uint8_t growth, bool needs_2_tiles_in_battle ) :
-                        m_name(name), m_faction(faction), m_level(level), m_upgrade(upgrade), m_growth(growth), m_needs_2_tiles_in_battle(needs_2_tiles_in_battle)
-                        {};
+            unit_info( const CreatureType type, const Faction faction, const uint8_t level, const Upgrade_level upgrade, const uint8_t growth, const bool needs_2_tiles_in_battle ) :
+                       m_type(type), m_faction(faction), m_level(level), m_upgrade(upgrade), m_growth(growth), m_needs_2_tiles_in_battle(needs_2_tiles_in_battle)
+                       {};
         }unit_info;
 
         struct battle_stats
@@ -154,10 +157,10 @@ struct Creature
 
             // Constructs a private structure containing data used during battles
             battle_stats( const uint8_t att, const uint8_t def, const uint8_t shots, const uint8_t min_dmg, const uint8_t max_dmg,
-                            const uint16_t hp, const uint8_t speed, Morale morale, Luck luck, const uint16_t fight_value, const uint32_t ai_value ) :
-                            m_att(att), m_def(def), m_shots(shots), m_min_dmg(min_dmg), m_max_dmg(max_dmg), m_hp(hp), m_speed(speed),
-                            m_morale(morale), m_luck(luck), m_fight_value(fight_value), m_ai_value(ai_value)
-                            {};
+                          const uint16_t hp, const uint8_t speed, Morale morale, Luck luck, const uint16_t fight_value, const uint32_t ai_value ) :
+                          m_att(att), m_def(def), m_shots(shots), m_min_dmg(min_dmg), m_max_dmg(max_dmg), m_hp(hp), m_speed(speed),
+                          m_morale(morale), m_luck(luck), m_fight_value(fight_value), m_ai_value(ai_value)
+                          {};
         }battle_stats;
 
         struct cost
@@ -345,12 +348,11 @@ struct Creature
             void set_special_abilities();
 
             // Fill the string in the field
-            special_abilities(std::string abilities) : m_abilities(abilities) {};
+            special_abilities(const std::string& abilities) : m_abilities(abilities) {};
         }special_abilities;
 
     public:
-        // Straight-forward logical limits that need to be set when constructing.
-        void logical_limitations();
+        CreatureType get_type() const { return unit_info.m_type; }
 
         std::string get_name() const { return unit_info.m_name; }
 

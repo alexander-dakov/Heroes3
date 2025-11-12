@@ -5,15 +5,16 @@
 
 uint8_t Creature::created_creatures = 0;
 
-Creature::Creature( const std::string& name, const Faction faction, const uint8_t level, const Upgrade_level upgrade, const uint8_t growth, const bool needs_2_tiles_in_battle,
+Creature::Creature( const CreatureType type, const Faction faction, const uint8_t level, const Upgrade_level upgrade, const uint8_t growth, const bool needs_2_tiles_in_battle,
                     const uint8_t att, const uint8_t def, const uint8_t shots, const uint8_t min_dmg, const uint8_t max_dmg, const uint16_t hp, const uint8_t speed, const Morale morale, const Luck luck, const uint16_t fight_value, const uint32_t ai_value,
                     const Resources& resources,
                     const std::string& abilities ) :
-                    unit_info(name, faction, level, upgrade, growth, needs_2_tiles_in_battle),
+                    unit_info(type, faction, level, upgrade, growth, needs_2_tiles_in_battle),
                     battle_stats(att, def, shots, min_dmg, max_dmg, hp, speed, morale, luck, fight_value, ai_value),
                     cost(resources),
                     special_abilities(abilities)
 {
+    unit_info.set_name_from_enum();
     unit_info.set_native_terrain();
 
     special_abilities.set_special_abilities();
@@ -23,6 +24,194 @@ Creature::Creature( const std::string& name, const Faction faction, const uint8_
     created_creatures++;
 
     // printf( "Creature %s created.\n", get_name().c_str() );
+}
+
+void Creature::unit_info::set_name_from_enum()
+{
+    switch ( this->m_type )
+    {
+        // Castle
+        case CreatureType::Pikeman       : m_name = "Pikeman";       break;
+        case CreatureType::Halberdier    : m_name = "Halberdier";    break;
+        case CreatureType::Archer        : m_name = "Archer";        break;
+        case CreatureType::Marksman      : m_name = "Marksman";      break;
+        case CreatureType::Griffin       : m_name = "Griffin";       break;
+        case CreatureType::Royal_Griffin : m_name = "Royal_Griffin"; break;
+        case CreatureType::Swordsman     : m_name = "Swordsman";     break;
+        case CreatureType::Crusader      : m_name = "Crusader";      break;
+        case CreatureType::Monk          : m_name = "Monk";          break;
+        case CreatureType::Zealot        : m_name = "Zealot";        break;
+        case CreatureType::Cavalier      : m_name = "Cavalier";      break;
+        case CreatureType::Champion      : m_name = "Champion";      break;
+        case CreatureType::Angel         : m_name = "Angel";         break;
+        case CreatureType::Archangel     : m_name = "Archangel";     break;
+
+        // Rampart
+        case CreatureType::Centaur          : m_name = "Centaur";          break;
+        case CreatureType::Centaur_Captain  : m_name = "Centaur_Captain";  break;
+        case CreatureType::Dwarf            : m_name = "Dwarf";            break;
+        case CreatureType::Battle_Dwarf     : m_name = "Battle_Dwarf";     break;
+        case CreatureType::Wood_Elf         : m_name = "Wood_Elf";         break;
+        case CreatureType::Grand_Elf        : m_name = "Grand_Elf";        break;
+        case CreatureType::Pegasus          : m_name = "Pegasus";          break;
+        case CreatureType::Silver_Pegasus   : m_name = "Silver_Pegasus";   break;
+        case CreatureType::Dendroid_Guard   : m_name = "Dendroid_Guard";   break;
+        case CreatureType::Dendroid_Soldier : m_name = "Dendroid_Soldier"; break;
+        case CreatureType::Unicorn          : m_name = "Unicorn";          break;
+        case CreatureType::War_Unicorn      : m_name = "War_Unicorn";      break;
+        case CreatureType::Green_Dragon     : m_name = "Green_Dragon";     break;
+        case CreatureType::Gold_Dragon      : m_name = "Gold_Dragon";      break;
+
+        // Tower
+        case CreatureType::Gremlin           : m_name = "Gremlin";           break;
+        case CreatureType::Master_Gremlin    : m_name = "Master_Gremlin";    break;
+        case CreatureType::Stone_Gargoyle    : m_name = "Stone_Gargoyle";    break;
+        case CreatureType::Obsidian_Gargoyle : m_name = "Obsidian_Gargoyle"; break;
+        case CreatureType::Stone_Golem       : m_name = "Stone_Golem";       break;
+        case CreatureType::Iron_Golem        : m_name = "Iron_Golem";        break;
+        case CreatureType::Mage              : m_name = "Mage";              break;
+        case CreatureType::Arch_Mage         : m_name = "Arch_Mage";         break;
+        case CreatureType::Genie             : m_name = "Genie";             break;
+        case CreatureType::Master_Genie      : m_name = "Master_Genie";      break;
+        case CreatureType::Naga              : m_name = "Naga";              break;
+        case CreatureType::Naga_Queen        : m_name = "Naga_Queen";        break;
+        case CreatureType::Giant             : m_name = "Giant";             break;
+        case CreatureType::Titan             : m_name = "Titan";             break;
+
+        // Inferno
+        case CreatureType::Imp           : m_name = "Imp";           break;
+        case CreatureType::Familiar      : m_name = "Familiar";      break;
+        case CreatureType::Gog           : m_name = "Gog";           break;
+        case CreatureType::Magog         : m_name = "Magog";         break;
+        case CreatureType::Hell_Hound    : m_name = "Hell_Hound";    break;
+        case CreatureType::Cerberus      : m_name = "Cerberus";      break;
+        case CreatureType::Demon         : m_name = "Demon";         break;
+        case CreatureType::Horned_Demon  : m_name = "Horned_Demon";  break;
+        case CreatureType::Pit_Fiend     : m_name = "Pit_Fiend";     break;
+        case CreatureType::Pit_Lord      : m_name = "Pit_Lord";      break;
+        case CreatureType::Efreet        : m_name = "Efreet";        break;
+        case CreatureType::Efreet_Sultan : m_name = "Efreet_Sultan"; break;
+        case CreatureType::Devil         : m_name = "Devil";         break;
+        case CreatureType::Arch_Devil    : m_name = "Arch_Devil";    break;
+
+        // Necropolis
+        case CreatureType::Skeleton         : m_name = "Skeleton";         break;
+        case CreatureType::Skeleton_Warrior : m_name = "Skeleton_Warrior"; break;
+        case CreatureType::Walking_Dead     : m_name = "Walking_Dead";     break;
+        case CreatureType::Zombie           : m_name = "Zombie";           break;
+        case CreatureType::Wight            : m_name = "Wight";            break;
+        case CreatureType::Wraith           : m_name = "Wraith";           break;
+        case CreatureType::Vampire          : m_name = "Vampire";          break;
+        case CreatureType::Vampire_Lord     : m_name = "Vampire_Lord";     break;
+        case CreatureType::Lich             : m_name = "Lich";             break;
+        case CreatureType::Power_Lich       : m_name = "Power_Lich";       break;
+        case CreatureType::Black_Knight     : m_name = "Black_Knight";     break;
+        case CreatureType::Dread_Knight     : m_name = "Dread_Knight";     break;
+        case CreatureType::Bone_Dragon      : m_name = "Bone_Dragon";      break;
+        case CreatureType::Ghost_Dragon     : m_name = "Ghost_Dragon";     break;
+
+        // Dungeon
+        case CreatureType::Troglodyte          : m_name = "Troglodyte";          break;
+        case CreatureType::Infernal_Troglodyte : m_name = "Infernal_Troglodyte"; break;
+        case CreatureType::Harpy               : m_name = "Harpy";               break;
+        case CreatureType::Harpy_Hag           : m_name = "Harpy_Hag";           break;
+        case CreatureType::Beholder            : m_name = "Beholder";            break;
+        case CreatureType::Evil_Eye            : m_name = "Evil_Eye";            break;
+        case CreatureType::Medusa              : m_name = "Medusa";              break;
+        case CreatureType::Medusa_Queen        : m_name = "Medusa_Queen";        break;
+        case CreatureType::Minotaur            : m_name = "Minotaur";            break;
+        case CreatureType::Minotaur_King       : m_name = "Minotaur_King";       break;
+        case CreatureType::Manticore           : m_name = "Manticore";           break;
+        case CreatureType::Scorpicore          : m_name = "Scorpicore";          break;
+        case CreatureType::Red_Dragon          : m_name = "Red_Dragon";          break;
+        case CreatureType::Black_Dragon        : m_name = "Black_Dragon";        break;
+
+        // Stronghold
+        case CreatureType::Goblin           : m_name = "Goblin";           break;
+        case CreatureType::Hobgoblin        : m_name = "Hobgoblin";        break;
+        case CreatureType::Wolf_Rider       : m_name = "Wolf_Rider";       break;
+        case CreatureType::Wolf_Raider      : m_name = "Wolf_Raider";      break;
+        case CreatureType::Orc              : m_name = "Orc";              break;
+        case CreatureType::Orc_Chieftain    : m_name = "Orc_Chieftain";    break;
+        case CreatureType::Ogre             : m_name = "Ogre";             break;
+        case CreatureType::Ogre_Mage        : m_name = "Ogre_Mage";        break;
+        case CreatureType::Roc              : m_name = "Roc";              break;
+        case CreatureType::Thunderbird      : m_name = "Thunderbird";      break;
+        case CreatureType::Cyclops          : m_name = "Cyclops";          break;
+        case CreatureType::Cyclops_King     : m_name = "Cyclops_King";     break;
+        case CreatureType::Behemoth         : m_name = "Behemoth";         break;
+        case CreatureType::Ancient_Behemoth : m_name = "Ancient_Behemoth"; break;
+
+        // Fortress
+        case CreatureType::Gnoll            : m_name = "Gnoll";            break;
+        case CreatureType::Gnoll_Marauder   : m_name = "Gnoll_Marauder";   break;
+        case CreatureType::Lizardman        : m_name = "Lizardman";        break;
+        case CreatureType::Lizard_Warrior   : m_name = "Lizard_Warrior";   break;
+        case CreatureType::Serpent_Fly      : m_name = "Serpent_Fly";      break;
+        case CreatureType::Dragon_Fly       : m_name = "Dragon_Fly";       break;
+        case CreatureType::Basilisk         : m_name = "Basilisk";         break;
+        case CreatureType::Greater_Basilisk : m_name = "Greater_Basilisk"; break;
+        case CreatureType::Gorgon           : m_name = "Gorgon";           break;
+        case CreatureType::Mighty_Gorgon    : m_name = "Mighty_Gorgon";    break;
+        case CreatureType::Wyvern           : m_name = "Wyvern";           break;
+        case CreatureType::Wyvern_Monarch   : m_name = "Wyvern_Monarch";   break;
+        case CreatureType::Hydra            : m_name = "Hydra";            break;
+        case CreatureType::Chaos_Hydra      : m_name = "Chaos_Hydra";      break;
+
+        // Conflux
+        case CreatureType::Pixie             : m_name = "Pixie";             break;
+        case CreatureType::Sprite            : m_name = "Sprite";            break;
+        case CreatureType::Air_Elemental     : m_name = "Air_Elemental";     break;
+        case CreatureType::Storm_Elemental   : m_name = "Storm_Elemental";   break;
+        case CreatureType::Water_Elemental   : m_name = "Water_Elemental";   break;
+        case CreatureType::Ice_Elemental     : m_name = "Ice_Elemental";     break;
+        case CreatureType::Fire_Elemental    : m_name = "Fire_Elemental";    break;
+        case CreatureType::Energy_Elemental  : m_name = "Energy_Elemental";  break;
+        case CreatureType::Earth_Elemental   : m_name = "Earth_Elemental";   break;
+        case CreatureType::Magma_Elemental   : m_name = "Magma_Elemental";   break;
+        case CreatureType::Psychic_Elemental : m_name = "Psychic_Elemental"; break;
+        case CreatureType::Magic_Elemental   : m_name = "Magic_Elemental";   break;
+        case CreatureType::Firebird          : m_name = "Firebird";          break;
+        case CreatureType::Phoenix           : m_name = "Phoenix";           break;
+
+        // Cove
+        case CreatureType::Nymph       : m_name = "Nymph";       break;
+        case CreatureType::Oceanid     : m_name = "Oceanid";     break;
+        case CreatureType::Crew_Mate   : m_name = "Crew_Mate";   break;
+        case CreatureType::Seaman      : m_name = "Seaman";      break;
+        case CreatureType::Pirate      : m_name = "Pirate";      break;
+        case CreatureType::Corsair     : m_name = "Corsair";     break;
+        case CreatureType::Sea_Dog     : m_name = "Sea_Dog";     break;
+        case CreatureType::Stormbird   : m_name = "Stormbird";   break;
+        case CreatureType::Ayssid      : m_name = "Ayssid";      break;
+        case CreatureType::Sea_Witch   : m_name = "Sea_Witch";   break;
+        case CreatureType::Sorceress   : m_name = "Sorceress";   break;
+        case CreatureType::Nix         : m_name = "Nix";         break;
+        case CreatureType::Nix_Warrior : m_name = "Nix_Warrior"; break;
+        case CreatureType::Sea_Serpent : m_name = "Sea_Serpent"; break;
+        case CreatureType::Haspid      : m_name = "Haspid";      break;
+
+        // Neutral
+        case CreatureType::Peasant        : m_name = "Peasant";        break;
+        case CreatureType::Halfling       : m_name = "Halfling";       break;
+        case CreatureType::Rogue          : m_name = "Rogue";          break;
+        case CreatureType::Boar           : m_name = "Boar";           break;
+        case CreatureType::Leprechaun     : m_name = "Leprechaun";     break;
+        case CreatureType::Nomad          : m_name = "Nomad";          break;
+        case CreatureType::Mummy          : m_name = "Mummy";          break;
+        case CreatureType::Sharpshooter   : m_name = "Sharpshooter";   break;
+        case CreatureType::Satyr          : m_name = "Satyr";          break;
+        case CreatureType::Steel_Golem    : m_name = "Steel_Golem";    break;
+        case CreatureType::Troll          : m_name = "Troll";          break;
+        case CreatureType::Gold_Golem     : m_name = "Gold_Golem";     break;
+        case CreatureType::Fangarm        : m_name = "Fangarm";        break;
+        case CreatureType::Diamond_Golem  : m_name = "Diamond_Golem";  break;
+        case CreatureType::Enchanter      : m_name = "Enchanter";      break;
+        case CreatureType::Faerie_Dragon  : m_name = "Faerie_Dragon";  break;
+        case CreatureType::Rust_Dragon    : m_name = "Rust_Dragon";    break;
+        case CreatureType::Crystal_Dragon : m_name = "Crystal_Dragon"; break;
+        case CreatureType::Azure_Dragon   : m_name = "Azure_Dragon";   break;
+    }
 }
 
 void Creature::unit_info::set_native_terrain()

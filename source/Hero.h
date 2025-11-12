@@ -33,7 +33,7 @@ namespace Hero_slots
     const uint8_t CHEST  = 100; // for storing unequipped items
 };
 
-enum Heroes
+enum Heroes : uint8_t
 {
     Dummy,
     Him,
@@ -89,6 +89,7 @@ class Hero
         };
 
     private:
+        Heroes m_hero;
         std::string m_name;
         Gender m_gender;
         Role m_role;
@@ -105,7 +106,7 @@ class Hero
             uint8_t m_power;
             uint8_t m_knowledge;
 
-            primary_skills( uint8_t attack, uint8_t defense, uint8_t power, uint8_t knowledge ) : 
+            primary_skills( const uint8_t attack, const uint8_t defense, const uint8_t power, const uint8_t knowledge ) : 
                             m_attack(attack), m_defense(defense), m_power(power), m_knowledge(knowledge)
                             {};
         }primary_skills;
@@ -138,8 +139,8 @@ class Hero
             bool m_has_catapult;
 
             war_machines( const bool has_first_aid = false, const bool has_ammo_cart = false, const bool has_ballista = false, const bool has_catapult = true ) :
-                            m_has_first_aid(has_first_aid), m_has_ammo_cart(has_ammo_cart), m_has_ballista(has_ballista), m_has_catapult(has_catapult)
-                            {};
+                          m_has_first_aid(has_first_aid), m_has_ammo_cart(has_ammo_cart), m_has_ballista(has_ballista), m_has_catapult(has_catapult)
+                          {};
         }war_machines;
 
         bool m_has_spellbook;
@@ -166,12 +167,12 @@ class Hero
 
         Position m_position = Position(0, 0);
 
-    public:
+    private:
         // Disallow the use of default constructor.
         Hero() = delete;
 
         // Parametrized constructor.
-        Hero( const std::string& name, const Gender gender, const Role hero_role, const Faction faction, const Team team, const uint8_t level, const uint32_t experience, 
+        Hero( const Heroes m_hero, const Gender gender, const Role hero_role, const Faction faction, const Team team, const uint8_t level, const uint32_t experience, 
               const uint8_t attack, const uint8_t defense, const uint8_t power, const uint8_t knowledge,
               const Specialty& specialty,
               const Morale morale, const Luck luck,
@@ -189,6 +190,9 @@ class Hero
         ~Hero();
 
     private:
+        // Set the name of the item when constructing.
+        void set_name_from_enum();
+
         // Create all heroes in the game, using the private constructor. Add them to a static map.
         static const std::map<Heroes, Hero*>& create_and_fill_heroes_list();
         // Use a counter to keep track if the map containing all Hero objects is incomplete.
@@ -198,6 +202,7 @@ class Hero
         // Return a pointer to already created Hero object.
         static Hero* get(const Heroes hero) { return create_and_fill_heroes_list().at(hero); }
 
+        Heroes get_hero_as_enum(){ return m_hero; }
         std::string get_name(){ return m_name; }
 
         Gender get_gender(){ return m_gender; }

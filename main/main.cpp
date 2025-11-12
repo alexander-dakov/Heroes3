@@ -87,7 +87,6 @@ int main()
 {
     #if TESTS == 1
     // test_create_creature_stack();
-    // test_create_hero();
     // test_hero_item_bonuses();
     // test_army_hero_bonuses();
     test_battle();

@@ -11,14 +11,14 @@ namespace
 
 uint16_t Hero::created_heroes = 0;
 
-Hero::Hero( const std::string& name, const Gender gender, const Role hero_role, const Faction faction, const Team team, const uint8_t level, const uint32_t experience,
+Hero::Hero( const Heroes hero, const Gender gender, const Role hero_role, const Faction faction, const Team team, const uint8_t level, const uint32_t experience,
             const uint8_t attack, const uint8_t defense, const uint8_t power, const uint8_t knowledge,
             const Specialty& specialty,
             const Morale morale, const Luck luck,
             // secondary skills
             const struct war_machines& war_machinery,
             const bool has_spellbook ) :
-            m_name(name), m_gender(gender), m_role(hero_role), m_faction(faction), m_team(team), m_level(level), m_experience(experience),
+            m_hero(hero), m_gender(gender), m_role(hero_role), m_faction(faction), m_team(team), m_level(level), m_experience(experience),
             primary_skills(attack, defense, power, knowledge),
             m_specialty(specialty),
             m_morale(morale), m_luck(luck),
@@ -26,6 +26,8 @@ Hero::Hero( const std::string& name, const Gender gender, const Role hero_role, 
             war_machines(war_machinery),
             m_has_spellbook(has_spellbook)
 {
+    set_name_from_enum();
+
     switch(m_faction)
     {
         case Faction::Castle     : get_role() ? m_class = Class::Cleric       : m_class = Class::Knight;       break;
@@ -51,6 +53,26 @@ Hero::~Hero()
 {
     // printf( "Hero %s destroyed!\n", get_name().c_str() );
 }
+
+void Hero::set_name_from_enum()
+{
+    switch ( this->m_hero )
+    {
+        case Heroes::Dummy : m_name = "Dummy"; break;
+        case Heroes::Him   : m_name = "Him";   break;
+        case Heroes::Her   : m_name = "Her";   break;
+
+        // Castle
+        case Heroes::Orrin : m_name = "Orrin"; break;
+
+        // Stronghold
+        case Heroes::Crag_Hack : m_name = "Crag_Hack"; break;
+
+        // Fortress
+        case Heroes::Tazar : m_name = "Tazar"; break;
+    }
+}
+
 
 std::string Hero::get_gender_as_string()
 {
