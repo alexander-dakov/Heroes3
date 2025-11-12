@@ -13,7 +13,7 @@ Battlefield_Tile::~Battlefield_Tile()
 bool Battlefield_Tile::is_reachable()
 {
     auto const t = get_tile();
-    return (t == Tile::Normal) + (t == Tile::Fortification) + (t == Tile::Land_Mine) + (t == Tile::Quicksand);
+    return (t == Tile::Normal) || (t == Tile::Fortification) || (t == Tile::Land_Mine) || (t == Tile::Quicksand);
 }
 
 void Battlefield_Tile::update_symbol(const Team team, const char ch)

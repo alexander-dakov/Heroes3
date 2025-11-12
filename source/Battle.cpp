@@ -133,10 +133,10 @@ Battle::~Battle()
     // Reset battle symbols of the stacks of the battle winner (whoever it is)
     for( uint8_t i = 0; i < Hero_slots::ARMY; i++ )
     {
-        if(get_attacker()->get_army_stack(i) != nullptr)
+        if( get_attacker()->get_army_stack(i) != nullptr )
             get_attacker()->get_army_stack(i)->reset_battlefield_symbol();
 
-        if(get_defender()->get_army_stack(i) != nullptr)
+        if( get_defender()->get_army_stack(i) != nullptr )
             get_defender()->get_army_stack(i)->reset_battlefield_symbol();
     }
 
@@ -599,8 +599,6 @@ void Battle::on_stack_turn(Stack* stack, bool morale_rolled)
     if(action == "M")
     {
         printf("\nEnter coordinates to desired location :");
-        // uint16_t x, y; // uint16_t instead of uint8_t, because otherwise it gets read as char (ascii code)
-
         Position pos = enter_battlefield_coordinates();
         uint8_t x = pos.x;
         uint8_t y = pos.y;
@@ -845,7 +843,19 @@ void Battle::set_global_buffs_and_debuffs()
 
 bool Battle::tile_is_reachable(const uint8_t x, const uint8_t y, Stack* const stack)
 {
-    return battlefield[y][x].is_reachable() && ( std::abs(x - stack->get_position().x) + std::abs(y - stack->get_position().y) <= stack->get_speed() );
+    const auto pos = stack->get_position();
+    auto stack_can_reach_unoccupied_tile = [&](const uint8_t x, const uint8_t y) { return battlefield[y][x].is_reachable() && ( std::abs(x - pos.x) + std::abs(y - pos.y) ) <= stack->get_speed(); };
+    bool result = stack_can_reach_unoccupied_tile(x, y);
+
+    // If the creature is walking, then its stack should be able to reach the target tile by first reaching the reachable neighbouring one (up/down/left/right)
+    if( !stack->get_creature()->get_is_flying() )
+    {
+        result &= ( (x >= 1)                   && stack_can_reach_unoccupied_tile((x - 1)*(x >= 1), y)                   )  // can stack reach the tile on the left
+               || ( (x <= Battlefield::LENGTH) && stack_can_reach_unoccupied_tile((x + 1)*(x <= Battlefield::LENGTH), y) )  // can stack reach the tile on the right
+               || ( (y >= 1)                   && stack_can_reach_unoccupied_tile(x, (y - 1)*(y >= 1))                   )  // can stack reach the tile below
+               || ( (y <= Battlefield::WIDTH)  && stack_can_reach_unoccupied_tile(x, (y + 1)*(y <= Battlefield::WIDTH))  ); // can stack reach the tile above
+    }
+    return result;
 }
 
 bool Battle::enemy_is_reachable(Stack* const stack, Stack* const enemy_stack)
@@ -892,7 +902,7 @@ void Battle::select_location_around_enemy_stack(Position& pos, Stack* const stac
 
     if(counter)
     {
-        printf("Possible locations to attack from :\n");
+        printf("%d possible locations to attack from :\n", counter);
         for( uint8_t i = 0; i < counter; ++i )
             printf("Location %d = [%d;%d]\n", i + 1, m_positions_around_stack[i].x, m_positions_around_stack[i].y);
 
@@ -1043,10 +1053,9 @@ void Battle::move_stack(Stack* stack, const uint8_t x, const uint8_t y)
                 break;
         }
 
-        stack->set_distance_traveled( distance_traveled*( stack->get_creature()->get_has_jousting() ) );
+        stack->set_distance_traveled( distance_traveled * ( stack->get_creature()->get_has_jousting() ) );
         stack->set_position(current_x, current_y); // this acts like flying / teleporting and it should not
     }
-
 
     pos = stack->get_position(); // get the new location - might be different from desired if the stack stumbled upon a quicksand
 
