@@ -17,13 +17,13 @@ struct Specialty
         Specialty() = delete;
 
         // Parametrized constructor.
-        Specialty(std::string name, std::string effect) : m_name(name), m_effect(effect) {}
+        Specialty( const std::string& name, const std::string& effect ) : m_name(name), m_effect(effect) {}
 
         // Copy constructor by reference is used in Hero constructor.
-        Specialty(const Specialty& specialty) : m_name(specialty.m_name), m_effect(specialty.m_effect) {}
+        Specialty( const Specialty& specialty ) : m_name(specialty.m_name), m_effect(specialty.m_effect) {}
 
         // Disallow the use of move constructor.
-        Specialty(Specialty&& specialty) = delete;
+        Specialty( Specialty&& specialty ) = delete;
 
         // Getters.
         std::string get_name()   { return m_name;   }

@@ -1,9 +1,8 @@
-#include "Hero.h"
 #include <cstdint>
+#include "Hero.h"
 
 namespace
 {
-    const uint8_t KNOWLEDGE_TO_MANA_MULTIPLIER = 10;
     const uint16_t INITIAL_MOVEMENT_POINTS = 1900;
     const uint8_t MAX_LEVEL = 75;
     const uint8_t LEVEL_10 = 10;
@@ -12,14 +11,14 @@ namespace
 uint16_t Hero::created_heroes = 0;
 
 Hero::Hero( const Heroes hero, const Gender gender, const Role hero_role, const Faction faction, const Team team, const uint8_t level, const uint32_t experience,
-            const uint8_t attack, const uint8_t defense, const uint8_t power, const uint8_t knowledge,
+            const struct primary_skills& p_skills,
             const Specialty& specialty,
             const Morale morale, const Luck luck,
             // secondary skills
             const struct war_machines& war_machinery,
             const bool has_spellbook ) :
             m_hero(hero), m_gender(gender), m_role(hero_role), m_faction(faction), m_team(team), m_level(level), m_experience(experience),
-            primary_skills(attack, defense, power, knowledge),
+            primary_skills(p_skills),
             m_specialty(specialty),
             m_morale(morale), m_luck(luck),
             // {"None", ...} write them in some way and change field in Hero.h,
@@ -42,8 +41,10 @@ Hero::Hero( const Heroes hero, const Gender gender, const Role hero_role, const 
         case Faction::Cove       : get_role() ? m_class = Class::Navigator    : m_class = Class::Captain;      break;
         case Faction::Neutral    : break; // this is added to satisfy a compiler warning
     }
-    m_mana = knowledge * KNOWLEDGE_TO_MANA_MULTIPLIER;
-    m_mana_left = m_mana;
+
+    reset_mana();
+    reset_mana_left();
+
     m_movement_points = INITIAL_MOVEMENT_POINTS; // TO DO : implement movement points according to army
 
     created_heroes++;
@@ -367,7 +368,7 @@ void Hero::equip_item(const Item* item)
     add_power(     item->get_power_bonus()     );
     add_knowledge( item->get_knowledge_bonus() );
     if( item->get_knowledge_bonus() )
-        update_mana();
+        reset_mana();
 
     add_morale( item->get_morale_bonus() );
     add_luck(   item->get_luck_bonus()   );
@@ -426,7 +427,7 @@ void Hero::unequip_item(const Item* item)
     add_power(     -item->get_power_bonus()     );
     add_knowledge( -item->get_knowledge_bonus() );
     if( item->get_knowledge_bonus() )
-        update_mana();
+        reset_mana();
 
     add_morale( -item->get_morale_bonus() );
     add_luck(   -item->get_luck_bonus()   );

@@ -9,21 +9,20 @@ struct Position
     uint8_t x;
     uint8_t y;
     
-    // Disallow the use of default constructor.
-    // Position() = default;// = delete
-    Position() : x(-1), y(-1) {} // = delete
+    // Default constructor.
+    Position() : x(-1), y(-1) {}
 
     // Parametrized constructor.
-    Position(const uint8_t X, const uint8_t Y) : x(X), y(Y) {}
+    Position( const uint8_t X, const uint8_t Y ) : x(X), y(Y) {}
     
     // Copy constructor.
-    Position(const Position& position) : x(position.x),  y(position.y)  {}
+    Position( const Position& position ) : x(position.x),  y(position.y)  {}
     
     // Parametrized constructor.
-    Position(const Position* position) : x(position->x), y(position->y) {}
+    Position( const Position* position ) : x(position->x), y(position->y) {}
     
-    // Disallow the use of move constructor.
-    Position(Position&& position);// = delete;
+    // Allow the use of move constructor.
+    Position( Position&& position ) = default;
     
     Position& operator=(const Position& other)
     {

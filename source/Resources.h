@@ -17,17 +17,17 @@ struct Resources
     Resources() = delete;
 
     // Allow the use of parametrized constructor.
-    Resources(uint32_t gold = 0, uint32_t mercury = 0, uint32_t sulfur = 0, uint32_t crystals = 0, uint32_t gems = 0, uint32_t wood = 0, uint32_t ore = 0 ) :
+    Resources( const uint32_t gold = 0, const uint32_t mercury = 0, const uint32_t sulfur = 0, const uint32_t crystals = 0, const uint32_t gems = 0, const uint32_t wood = 0, const uint32_t ore = 0 ) :
     Gold(gold), Mercury(mercury), Sulfur(sulfur), Crystals(crystals), Gems(gems), Wood(wood), Ore(ore)
     {}
 
     // Allow the use of a copy constructor by reference.
-    Resources(const Resources& resources) :
+    Resources( const Resources& resources ) :
     Gold(resources.Gold), Mercury(resources.Mercury), Sulfur(resources.Sulfur), Crystals(resources.Crystals), Gems(resources.Gems), Wood(resources.Wood), Ore(resources.Ore)
     {}
 
     // Disallow the use of move constructor.
-    Resources(Resources&& resources) = delete;
+    Resources( Resources&& resources ) = delete;
 };
 
 #endif

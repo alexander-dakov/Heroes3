@@ -33,6 +33,11 @@ namespace Hero_slots
     const uint8_t CHEST  = 100; // for storing unequipped items
 };
 
+namespace 
+{
+    const uint8_t KNOWLEDGE_TO_MANA_MULTIPLIER = 10;
+};
+
 enum Heroes : uint8_t
 {
     Dummy,
@@ -165,7 +170,7 @@ class Hero
 
         std::array<std::unique_ptr<Stack>, Hero_slots::ARMY> army = {nullptr};
 
-        Position m_position = Position(0, 0);
+        Position m_position{0, 0};
 
     private:
         // Disallow the use of default constructor.
@@ -173,7 +178,7 @@ class Hero
 
         // Parametrized constructor.
         Hero( const Heroes m_hero, const Gender gender, const Role hero_role, const Faction faction, const Team team, const uint8_t level, const uint32_t experience, 
-              const uint8_t attack, const uint8_t defense, const uint8_t power, const uint8_t knowledge,
+              const struct primary_skills& p_skills,
               const Specialty& specialty,
               const Morale morale, const Luck luck,
               // secondary skills
@@ -181,10 +186,10 @@ class Hero
               const bool has_spellbook );
 
         // Disallow the use of copy constructor.
-        Hero(const Hero& hero) = delete;
+        Hero( const Hero& hero ) = delete;
 
         // Disallow the use of move constructor.
-        Hero(Hero&& hero) = delete;
+        Hero( Hero&& hero ) = delete;
 
         // Destructor.
         ~Hero();
@@ -230,19 +235,15 @@ class Hero
         void add_experience(const uint32_t experience);
         uint32_t get_experience(){ return m_experience; }
 
-        void set_attack(const uint8_t attack) { primary_skills.m_attack = attack; }
         void add_attack(const  int8_t attack) { primary_skills.m_attack = std::max(0, primary_skills.m_attack + attack); } // bug prone
         uint8_t get_attack() {return primary_skills.m_attack; }
 
-        void set_defense(const uint8_t defense) { primary_skills.m_defense = defense; }
         void add_defense(const  int8_t defense) { primary_skills.m_defense = std::max(0, primary_skills.m_defense + defense); } // bug prone
         uint8_t get_defense() {return primary_skills.m_defense; }
 
-        void set_power(const uint8_t power) { primary_skills.m_power = power; }
         void add_power(const  int8_t power) { primary_skills.m_power = std::max(0, primary_skills.m_power + power); } // bug prone
         uint8_t get_power() {return primary_skills.m_power; }
 
-        void set_knowledge(const uint8_t knowledge) { primary_skills.m_knowledge = knowledge; }
         void add_knowledge(const  int8_t knowledge) { primary_skills.m_knowledge = std::max(0, primary_skills.m_knowledge + knowledge); } // bug prone
         uint8_t get_knowledge() {return primary_skills.m_knowledge; }
 
@@ -265,16 +266,14 @@ class Hero
         void add_luck(const int8_t luck) { m_luck = clamp_luck( m_luck + luck ); }
         Luck get_luck() { return m_luck; }
 
-        void set_mana(const uint16_t mana) { m_mana = mana; }
-        void update_mana() { m_mana = 10*get_knowledge(); }
+        void reset_mana() { m_mana = KNOWLEDGE_TO_MANA_MULTIPLIER * primary_skills.m_knowledge; }
         uint16_t get_mana() { return m_mana; }
 
-        void set_mana_left(const uint16_t mana_left) { m_mana_left = mana_left; }
         void add_mana_left(const uint16_t mana) { m_mana_left += mana; }
-        void reset_mana_left() { m_mana_left = m_mana; }
+        void reduce_mana_left(const uint16_t mana) { m_mana_left -= mana; } // before casting a spell, the available mana should be checked, otherwise this might overflow
+        void reset_mana_left() { reset_mana(); m_mana_left = m_mana; }
         uint16_t get_mana_left() { return m_mana_left; }
 
-        void set_movement_points(const uint16_t movement_points) { m_movement_points  = movement_points; }
         void add_movement_points(const uint16_t movement_points) { m_movement_points += movement_points; }
         uint16_t get_movement_points() { return m_movement_points; }
         

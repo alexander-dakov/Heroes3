@@ -83,10 +83,10 @@ struct Item
         Item( const Spell& spellscroll, const Resources& resources );
 
         // Disallow the use of copy constructor.
-        Item(const Item& item) = delete;
+        Item( const Item& item ) = delete;
 
         // Disallow the use of move constructor.
-        Item(Item&& item) = delete;
+        Item( Item&& item ) = delete;
 
         ~Item();
 

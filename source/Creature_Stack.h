@@ -49,7 +49,7 @@ class Stack
             uint8_t m_number_of_casts_left; // modified by battle
 
             // Constructs a private structure containing data used during battles when no hero is leading the army.
-            battle_stats(const Creature* const m_creature)
+            battle_stats( const Creature* const m_creature )
             {
                 m_att        = m_creature->get_att();
                 m_def        = m_creature->get_def();
@@ -65,7 +65,7 @@ class Stack
 
         uint32_t m_number;
         char m_battlefield_symbol = ' ';
-        Position m_pos = Position(0, 0);
+        Position m_pos{0, 0};
         uint8_t m_distance_traveled = 0;
         bool m_has_perished = false;
         uint8_t m_retaliations_left = 1; // can be 0,1,2. Not applicable for special ability 'Unlimited retaliations'.
@@ -81,25 +81,25 @@ class Stack
         Stack() = delete;
 
         // Parametrized constructor used during battle.
-        Stack(const Creature* const creature, const uint32_t number, const uint8_t pos_x, const uint8_t pos_y, const char battlefield_symbol, const Team team);
+        Stack( const Creature* const creature, const uint32_t number, const uint8_t pos_x, const uint8_t pos_y, const char battlefield_symbol, const Team team );
         
         // Parametrized constructor used in when purchasing a stack, moving at least part of it from one army to another or seperating it into smaller stacks.
-        Stack(const Creature* const creature, const uint32_t number, const Team team);
+        Stack( const Creature* const creature, const uint32_t number, const Team team );
 
         // Parametrized constructor used when creating stack, by passing objects directly from Creature_List. Used when creating the initial army of a Hero.s
-        Stack(const Creature& creature, const uint32_t number, const Team team);
+        Stack( const Creature& creature, const uint32_t number, const Team team );
 
         // Parametrized constructor, used when moving a stack from one army to another or seperating it into smaller stacks.
-        Stack(const Stack& stack, const uint32_t number);
+        Stack( const Stack& stack, const uint32_t number );
 
         // Parametrized constructor, used when moving a stack from one army to another or seperating it into smaller stacks.
-        Stack(const Stack* stack, const uint32_t number);
+        Stack( const Stack* stack, const uint32_t number );
 
         // Disallow the use of copy constructor.
-        Stack(const Stack& stack) = delete;
+        Stack( const Stack& stack ) = delete;
         
         // Disallow the use of move constructor.
-        Stack(Stack&& stack) = delete;
+        Stack( Stack&& stack ) = delete;
 
         // Destructor
         ~Stack();
@@ -139,8 +139,8 @@ class Stack
         void add_morale(const Morale morale);
         Morale get_morale() { return battle_stats.m_morale; }
 
-        void set_luck(const Luck luck)   { battle_stats.m_luck = luck; }
-        void add_luck(const Luck luck)   { battle_stats.m_luck = clamp_luck( battle_stats.m_luck + luck ); }
+        void set_luck(const Luck luck) { battle_stats.m_luck = luck; }
+        void add_luck(const Luck luck) { battle_stats.m_luck = clamp_luck( battle_stats.m_luck + luck ); }
         Luck get_luck() { return battle_stats.m_luck; }
 
         uint8_t get_number_of_casts_left() { return battle_stats.m_number_of_casts_left; }

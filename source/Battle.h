@@ -29,13 +29,13 @@ class Battle
         Battle() = delete;
 
         // Parametrized constructor, used upon starting a battle between two armies.
-        Battle(Hero& attacker, Hero& defender, const Format format, const Terrain terrain); // constructing the battlefield, managing the event and then destroying the constructed objects
+        Battle( Hero& attacker, Hero& defender, const Format format, const Terrain terrain ); // constructing the battlefield, managing the event and then destroying the constructed objects
 
         // Disallow the use of copy constructor.
-        Battle(const Battle& battle) = delete;
+        Battle( const Battle& battle ) = delete;
 
         // Disallow the use of move constructor.
-        Battle(Battle&& battle) = delete;
+        Battle( Battle&& battle ) = delete;
 
         ~Battle();
 

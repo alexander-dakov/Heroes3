@@ -50,13 +50,13 @@ class Spell
         Spell() = delete;
 
         // Disallow the use of copy constructor.
-        Spell(const Spell& spell) = delete;
+        Spell( const Spell& spell ) = delete;
 
         // Disallow the use of move constructor.
-        Spell(Spell&& spell) = delete;
+        Spell( Spell&& spell ) = delete;
 
         // Destructor.
-        ~Spell() {}
+        ~Spell() = default;
         
     public:
         // Getters.

@@ -19,13 +19,13 @@ struct Secondary_Skill
         Secondary_Skill() = delete;
 
         // Parametrized constructor.
-        Secondary_Skill(Skill_level level, std::string name, std::string effect) : m_level(level), m_name(name), m_effect(effect) {}
+        Secondary_Skill( const Skill_level level, const std::string& name, const std::string& effect ) : m_level(level), m_name(name), m_effect(effect) {}
 
         // Disallow the use of copy constructor.
-        Secondary_Skill(const Secondary_Skill& secondary_skill) = delete;
+        Secondary_Skill( const Secondary_Skill& secondary_skill ) = delete;
 
         // Disallow the use of move constructor.
-        Secondary_Skill(Secondary_Skill&& secondary_skill) = delete;
+        Secondary_Skill( Secondary_Skill&& secondary_skill ) = delete;
 
         // Getters.
         Skill_level get_level()  { return m_level;  }
