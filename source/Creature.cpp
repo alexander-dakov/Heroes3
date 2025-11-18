@@ -1,3 +1,4 @@
+#include <iostream>
 #include <string>
 
 #include "Creature.h"
@@ -256,154 +257,154 @@ void Creature::logical_limitations()
 
     if( unit_info.m_faction == Faction::Necropolis )
     {
-        special_abilities.set_ability_bit(Special_abilities::Abilities::IS_UNDEAD);
-        special_abilities.turn_off_ability_bit(Special_abilities::Abilities::IS_BLOODLESS);
+        special_abilities.set_ability_bit(Creature::special_abilities::Abilities::IS_UNDEAD);
+        special_abilities.turn_off_ability_bit(Creature::special_abilities::Abilities::IS_BLOODLESS);
     }
     else if( get_is_undead() )
-        special_abilities.turn_off_ability_bit(Special_abilities::Abilities::IS_BLOODLESS);
+        special_abilities.turn_off_ability_bit(Creature::special_abilities::Abilities::IS_BLOODLESS);
 
     if( get_is_bloodless() )
-        special_abilities.turn_off_ability_bit(Special_abilities::Abilities::IS_BLOODLESS);
+        special_abilities.turn_off_ability_bit(Creature::special_abilities::Abilities::IS_BLOODLESS);
 
     if( !get_is_ranged() )
         battle_stats.m_shots = 0;
 
     if( get_is_undead() || get_is_bloodless() ) // all undead, golems and elementals
-        special_abilities.set_ability_bit(Special_abilities::Abilities::IS_IMMUNE_TO_MIND_SPELLS);
+        special_abilities.set_ability_bit(Creature::special_abilities::Abilities::IS_IMMUNE_TO_MIND_SPELLS);
 }
 
-const std::map< std::string, std::vector<Special_abilities::Abilities> >& Creature::special_abilities::create_map_of_all_abilities()
+const std::map< std::string, std::vector<Creature::special_abilities::Abilities> >& Creature::special_abilities::create_map_of_all_abilities()
 {
-    static std::map< std::string, std::vector<Special_abilities::Abilities> > all_abilities; // all special abilities in existance, refering to their respective boolean
+    static std::map< std::string, std::vector<Abilities> > all_abilities; // all special abilities in existance, refering to their respective boolean
 
-    all_abilities["Undead."]        = { Special_abilities::Abilities::IS_UNDEAD    };
-    all_abilities["Non-living."]    = { Special_abilities::Abilities::IS_BLOODLESS };
+    all_abilities["Undead."]        = { Abilities::IS_UNDEAD    };
+    all_abilities["Non-living."]    = { Abilities::IS_BLOODLESS };
 
-    all_abilities["Flying."]        = { Special_abilities::Abilities::IS_FLYING };
-    all_abilities["Teleporting."]   = { Special_abilities::Abilities::IS_FLYING };
-    all_abilities["Ranged attack."] = { Special_abilities::Abilities::IS_RANGED };
+    all_abilities["Flying."]        = { Abilities::IS_FLYING };
+    all_abilities["Teleporting."]   = { Abilities::IS_FLYING };
+    all_abilities["Ranged attack."] = { Abilities::IS_RANGED };
 
-    all_abilities["No melee penalty."]    = { Special_abilities::Abilities::NO_MELEE_PENALTY    };
-    all_abilities["No obstacle penalty."] = { Special_abilities::Abilities::NO_OBSTACLE_PENALTY };
-    all_abilities["No range penalty."]    = { Special_abilities::Abilities::NO_RANGE_PENALTY    };
+    all_abilities["No melee penalty."]    = { Abilities::NO_MELEE_PENALTY    };
+    all_abilities["No obstacle penalty."] = { Abilities::NO_OBSTACLE_PENALTY };
+    all_abilities["No range penalty."]    = { Abilities::NO_RANGE_PENALTY    };
 
-    all_abilities["Strike and return."]      = { Special_abilities::Abilities::STRIKE_AND_RETURN       };
-    all_abilities["Strike and return."]      = { Special_abilities::Abilities::STRIKE_AND_RETURN       };
-    all_abilities["Can attack siege walls."] = { Special_abilities::Abilities::CAN_ATTACK_SIEGE_WALLS  };
+    all_abilities["Strike and return."]      = { Abilities::STRIKE_AND_RETURN       };
+    all_abilities["Strike and return."]      = { Abilities::STRIKE_AND_RETURN       };
+    all_abilities["Can attack siege walls."] = { Abilities::CAN_ATTACK_SIEGE_WALLS  };
 
-    all_abilities["Ferocity."]                             = { Special_abilities::Abilities::HAS_FEROCITY                };
-    all_abilities["Double attack."]                        = { Special_abilities::Abilities::HAS_DOUBLE_ATTACK           };
-    all_abilities["Jousting bonus."]                       = { Special_abilities::Abilities::HAS_JOUSTING                };
-    all_abilities["Revenge."]                              = { Special_abilities::Abilities::HAS_REVENGE                 };
-    all_abilities["3-headed attack."]                      = { Special_abilities::Abilities::HAS_3_HEADED_ATTACK         };
-    all_abilities["Fireball attack."]                      = { Special_abilities::Abilities::HAS_FIREBALL_ATTACK         };
-    all_abilities["Death cloud."]                          = { Special_abilities::Abilities::HAS_CLOUD_ATTACK            };
-    all_abilities["Attack all adjacent enemies."]          = { Special_abilities::Abilities::HAS_ATTACK_ADJACENT_ENEMIES };
-    all_abilities["Attack all adjacent hexes."]            = { Special_abilities::Abilities::HAS_ATTACK_ADJACENT_HEXES   };
-    all_abilities["Breath attack."]                        = { Special_abilities::Abilities::HAS_BREATH_ATTACK           };
-    all_abilities["Hates Efreeti and Efreet Sultans."]     = { Special_abilities::Abilities::HATES_EFREETI               };
-    all_abilities["Hates Genies and Master Genies."]       = { Special_abilities::Abilities::HATES_GENIES                };
-    all_abilities["Hates Devils and Arch Devils."]         = { Special_abilities::Abilities::HATES_DEVILS                };
-    all_abilities["Hates Angels and Archangels."]          = { Special_abilities::Abilities::HATES_ANGELS                };
-    all_abilities["Hates Black Dragons."]                  = { Special_abilities::Abilities::HATES_BLACK_DRAGONS         };
-    all_abilities["Hates Titans."]                         = { Special_abilities::Abilities::HATES_TITANS                };
-    all_abilities["Ignores 40% of enemy's defense skill."] = { Special_abilities::Abilities::IGNORE_ENEMY_DEFENSE        };
-    all_abilities["Ignores 80% of enemy's defense skill."] = { Special_abilities::Abilities::IGNORE_ENEMY_DEFENSE        };
+    all_abilities["Ferocity."]                             = { Abilities::HAS_FEROCITY                };
+    all_abilities["Double attack."]                        = { Abilities::HAS_DOUBLE_ATTACK           };
+    all_abilities["Jousting bonus."]                       = { Abilities::HAS_JOUSTING                };
+    all_abilities["Revenge."]                              = { Abilities::HAS_REVENGE                 };
+    all_abilities["3-headed attack."]                      = { Abilities::HAS_3_HEADED_ATTACK         };
+    all_abilities["Fireball attack."]                      = { Abilities::HAS_FIREBALL_ATTACK         };
+    all_abilities["Death cloud."]                          = { Abilities::HAS_CLOUD_ATTACK            };
+    all_abilities["Attack all adjacent enemies."]          = { Abilities::HAS_ATTACK_ADJACENT_ENEMIES };
+    all_abilities["Attack all adjacent hexes."]            = { Abilities::HAS_ATTACK_ADJACENT_HEXES   };
+    all_abilities["Breath attack."]                        = { Abilities::HAS_BREATH_ATTACK           };
+    all_abilities["Hates Efreeti and Efreet Sultans."]     = { Abilities::HATES_EFREETI               };
+    all_abilities["Hates Genies and Master Genies."]       = { Abilities::HATES_GENIES                };
+    all_abilities["Hates Devils and Arch Devils."]         = { Abilities::HATES_DEVILS                };
+    all_abilities["Hates Angels and Archangels."]          = { Abilities::HATES_ANGELS                };
+    all_abilities["Hates Black Dragons."]                  = { Abilities::HATES_BLACK_DRAGONS         };
+    all_abilities["Hates Titans."]                         = { Abilities::HATES_TITANS                };
+    all_abilities["Ignores 40% of enemy's defense skill."] = { Abilities::IGNORE_ENEMY_DEFENSE        };
+    all_abilities["Ignores 80% of enemy's defense skill."] = { Abilities::IGNORE_ENEMY_DEFENSE        };
 
-    all_abilities["Ignores 30% of enemy's attack skill."] = { Special_abilities::Abilities::IGNORE_ENEMY_ATTACK };
-    all_abilities["Ignores 60% of enemy's attack skill."] = { Special_abilities::Abilities::IGNORE_ENEMY_ATTACK };
+    all_abilities["Ignores 30% of enemy's attack skill."] = { Abilities::IGNORE_ENEMY_ATTACK };
+    all_abilities["Ignores 60% of enemy's attack skill."] = { Abilities::IGNORE_ENEMY_ATTACK };
 
-    all_abilities["Two retaliations."]       = { Special_abilities::Abilities::HAS_TWO_RETALIATIONS       };
-    all_abilities["Unlimited retaliations."] = { Special_abilities::Abilities::HAS_UNLIMITED_RETALIATIONS };
-    all_abilities["No enemy retaliation."]   = { Special_abilities::Abilities::HAS_NO_ENEMY_RETALIATIONS  };
+    all_abilities["Two retaliations."]       = { Abilities::HAS_TWO_RETALIATIONS       };
+    all_abilities["Unlimited retaliations."] = { Abilities::HAS_UNLIMITED_RETALIATIONS };
+    all_abilities["No enemy retaliation."]   = { Abilities::HAS_NO_ENEMY_RETALIATIONS  };
 
-    all_abilities["Regeneration."] = { Special_abilities::Abilities::CASTS_REGENERATION };
-    all_abilities["Mana drain."]   = { Special_abilities::Abilities::CASTS_MANA_DRAIN   };
+    all_abilities["Regeneration."] = { Abilities::CASTS_REGENERATION };
+    all_abilities["Mana drain."]   = { Abilities::CASTS_MANA_DRAIN   };
 
-    all_abilities["Binding attack."]                                    = { Special_abilities::Abilities::CASTS_BINDING                             };
-    all_abilities["Life drain."]                                        = { Special_abilities::Abilities::CASTS_LIFE_DRAIN                          };
-    all_abilities["Casts Dispel to benefical spells per attack."]       = { Special_abilities::Abilities::CASTS_DISPELL_ON_BUFFS                    };
-    all_abilities["Casts Weakness per attack."]                         = { Special_abilities::Abilities::CASTS_WEAKNESS                            };
-    all_abilities["Casts Advanced Weakness per attack."]                = { Special_abilities::Abilities::CASTS_ADVANCED_WEAKNESS                   };
-    all_abilities["Casts Disrupting Ray on weakened enemies."]          = { Special_abilities::Abilities::CASTS_DISRUPTING_RAY_ON_WEAKEND          };
-    all_abilities["Casts Advanced Disrupting Ray on weakened enemies."] = { Special_abilities::Abilities::CASTS_ADVANCED_DISRUPTING_RAY_ON_WEAKEND };
+    all_abilities["Binding attack."]                                    = { Abilities::CASTS_BINDING                             };
+    all_abilities["Life drain."]                                        = { Abilities::CASTS_LIFE_DRAIN                          };
+    all_abilities["Casts Dispel to benefical spells per attack."]       = { Abilities::CASTS_DISPELL_ON_BUFFS                    };
+    all_abilities["Casts Weakness per attack."]                         = { Abilities::CASTS_WEAKNESS                            };
+    all_abilities["Casts Advanced Weakness per attack."]                = { Abilities::CASTS_ADVANCED_WEAKNESS                   };
+    all_abilities["Casts Disrupting Ray on weakened enemies."]          = { Abilities::CASTS_DISRUPTING_RAY_ON_WEAKEND          };
+    all_abilities["Casts Advanced Disrupting Ray on weakened enemies."] = { Abilities::CASTS_ADVANCED_DISRUPTING_RAY_ON_WEAKEND };
 
-    all_abilities["20% chance to cast Disease per attack."]                       = { Special_abilities::Abilities::MAY_CAST_DISEASE          };
-    all_abilities["25% chance to cast Curse per attack."]                         = { Special_abilities::Abilities::MAY_CAST_CURSE            };
-    all_abilities["20% chance to cast Aging per attack."]                         = { Special_abilities::Abilities::MAY_CAST_AGING            };
-    all_abilities["30% chance to cast Poison per attack."]                        = { Special_abilities::Abilities::MAY_CAST_POISON           };
-    all_abilities["20% chance to cast Paralyzing Venom per attack."]              = { Special_abilities::Abilities::MAY_CAST_PARALYZING_VENOM };
-    all_abilities["20% chance to cast Fear to adjacent enemies before they act."] = { Special_abilities::Abilities::MAY_CAST_FEAR             };
-    all_abilities["20% chance to cast Petrify per melee attack."]                 = { Special_abilities::Abilities::MAY_CAST_PETRIFY          };
-    all_abilities["20% chance to cast Petrify per attack."]                       = { Special_abilities::Abilities::MAY_CAST_PETRIFY          };
-    all_abilities["20% chance to cast Blind per attack."]                         = { Special_abilities::Abilities::MAY_CAST_BLIND            };
-    all_abilities["20% chance to cast Lightning Strike per attack."]              = { Special_abilities::Abilities::MAY_CAST_LIGHTNING_STRIKE };
-    all_abilities["20% chance to cast Death Blow per attack."]                    = { Special_abilities::Abilities::MAY_CAST_DEATH_BLOW       };
-    all_abilities["10% chance to cast Death Stare per melee attack."]             = { Special_abilities::Abilities::MAY_CAST_DEATH_STARE      };
-    all_abilities["10% chance to cast Accurate Shot per ranged attack."]          = { Special_abilities::Abilities::MAY_CAST_ACCURATE_SHOT    };
-    all_abilities["20% chance to cast Acid Breath per attack."]                   = { Special_abilities::Abilities::MAY_CAST_ACID_BREATH      };
-    all_abilities["Can cast Hypnotize per attack."]                               = { Special_abilities::Abilities::MAY_CAST_HYPNOTIZE        };
+    all_abilities["20% chance to cast Disease per attack."]                       = { Abilities::MAY_CAST_DISEASE          };
+    all_abilities["25% chance to cast Curse per attack."]                         = { Abilities::MAY_CAST_CURSE            };
+    all_abilities["20% chance to cast Aging per attack."]                         = { Abilities::MAY_CAST_AGING            };
+    all_abilities["30% chance to cast Poison per attack."]                        = { Abilities::MAY_CAST_POISON           };
+    all_abilities["20% chance to cast Paralyzing Venom per attack."]              = { Abilities::MAY_CAST_PARALYZING_VENOM };
+    all_abilities["20% chance to cast Fear to adjacent enemies before they act."] = { Abilities::MAY_CAST_FEAR             };
+    all_abilities["20% chance to cast Petrify per melee attack."]                 = { Abilities::MAY_CAST_PETRIFY          };
+    all_abilities["20% chance to cast Petrify per attack."]                       = { Abilities::MAY_CAST_PETRIFY          };
+    all_abilities["20% chance to cast Blind per attack."]                         = { Abilities::MAY_CAST_BLIND            };
+    all_abilities["20% chance to cast Lightning Strike per attack."]              = { Abilities::MAY_CAST_LIGHTNING_STRIKE };
+    all_abilities["20% chance to cast Death Blow per attack."]                    = { Abilities::MAY_CAST_DEATH_BLOW       };
+    all_abilities["10% chance to cast Death Stare per melee attack."]             = { Abilities::MAY_CAST_DEATH_STARE      };
+    all_abilities["10% chance to cast Accurate Shot per ranged attack."]          = { Abilities::MAY_CAST_ACCURATE_SHOT    };
+    all_abilities["20% chance to cast Acid Breath per attack."]                   = { Abilities::MAY_CAST_ACID_BREATH      };
+    all_abilities["Can cast Hypnotize per attack."]                               = { Abilities::MAY_CAST_HYPNOTIZE        };
 
-    all_abilities["Fire Shield."] = { Special_abilities::Abilities::CASTS_FIRE_SHIELD };
+    all_abilities["Fire Shield."] = { Abilities::CASTS_FIRE_SHIELD };
 
-    all_abilities["Rebirth."] = { Special_abilities::Abilities::MAY_CAST_REBIRTH };
+    all_abilities["Rebirth."] = { Abilities::MAY_CAST_REBIRTH };
 
-    all_abilities["Can cast Ressurection once per battle."]        = { Special_abilities::Abilities::CAN_CAST_RESSURECTION          };
-    all_abilities["Can cast Advanced Fortune 3 times per battle."] = { Special_abilities::Abilities::CAN_CAST_ADVANCED_FORTUNE      };
-    all_abilities["Can cast Advanced Mirth 3 times per battle."]   = { Special_abilities::Abilities::CAN_CAST_ADVANCED_MIRTH        };
-    all_abilities["Spellcaster."]                                  = { Special_abilities::Abilities::IS_SPELLCASTER                 };
-    all_abilities["Spellcaster (Bloodlust)."]                      = { Special_abilities::Abilities::CAN_CAST_BLOODLUST             };
-    all_abilities["Spellcaster (Protection from Air)."]            = { Special_abilities::Abilities::CAN_CAST_PROTECTION_FROM_AIR   };
-    all_abilities["Spellcaster (Protection from Water)."]          = { Special_abilities::Abilities::CAN_CAST_PROTECTION_FROM_WATER };
-    all_abilities["Spellcaster (Protection from Fire)."]           = { Special_abilities::Abilities::CAN_CAST_PROTECTION_FROM_FIRE  };
-    all_abilities["Spellcaster (Protection from Earth)."]          = { Special_abilities::Abilities::CAN_CAST_PROTECTION_FROM_EARTH };
-    all_abilities["Summon Demons."]                                = { Special_abilities::Abilities::CAN_CAST_SUMMON_DEMONS         };
+    all_abilities["Can cast Ressurection once per battle."]        = { Abilities::CAN_CAST_RESSURECTION          };
+    all_abilities["Can cast Advanced Fortune 3 times per battle."] = { Abilities::CAN_CAST_ADVANCED_FORTUNE      };
+    all_abilities["Can cast Advanced Mirth 3 times per battle."]   = { Abilities::CAN_CAST_ADVANCED_MIRTH        };
+    all_abilities["Spellcaster."]                                  = { Abilities::IS_SPELLCASTER                 };
+    all_abilities["Spellcaster (Bloodlust)."]                      = { Abilities::CAN_CAST_BLOODLUST             };
+    all_abilities["Spellcaster (Protection from Air)."]            = { Abilities::CAN_CAST_PROTECTION_FROM_AIR   };
+    all_abilities["Spellcaster (Protection from Water)."]          = { Abilities::CAN_CAST_PROTECTION_FROM_WATER };
+    all_abilities["Spellcaster (Protection from Fire)."]           = { Abilities::CAN_CAST_PROTECTION_FROM_FIRE  };
+    all_abilities["Spellcaster (Protection from Earth)."]          = { Abilities::CAN_CAST_PROTECTION_FROM_EARTH };
+    all_abilities["Summon Demons."]                                = { Abilities::CAN_CAST_SUMMON_DEMONS         };
 
-    all_abilities["Magic resistance 20%."]         = { Special_abilities::Abilities::HAS_MAGIC_RESIST      };
-    all_abilities["Magic resistance 40%."]         = { Special_abilities::Abilities::HAS_MAGIC_RESIST      };
-    all_abilities["Aura of magic resistance 20%."] = { Special_abilities::Abilities::HAS_MAGIC_RESIST_AURA };
-    all_abilities["Naturally has Magic Mirror."]   = { Special_abilities::Abilities::HAS_MAGIC_MIRROR      };
+    all_abilities["Magic resistance 20%."]         = { Abilities::HAS_MAGIC_RESIST      };
+    all_abilities["Magic resistance 40%."]         = { Abilities::HAS_MAGIC_RESIST      };
+    all_abilities["Aura of magic resistance 20%."] = { Abilities::HAS_MAGIC_RESIST_AURA };
+    all_abilities["Naturally has Magic Mirror."]   = { Abilities::HAS_MAGIC_MIRROR      };
 
-    all_abilities["Spell damage reduction 50%."] = { Special_abilities::Abilities::REDUCE_MAGIC_DAMAGE };
-    all_abilities["Spell damage reduction 75%."] = { Special_abilities::Abilities::REDUCE_MAGIC_DAMAGE };
-    all_abilities["Spell damage reduction 80%."] = { Special_abilities::Abilities::REDUCE_MAGIC_DAMAGE };
-    all_abilities["Spell damage reduction 85%."] = { Special_abilities::Abilities::REDUCE_MAGIC_DAMAGE };
-    all_abilities["Spell damage reduction 95%."] = { Special_abilities::Abilities::REDUCE_MAGIC_DAMAGE };
+    all_abilities["Spell damage reduction 50%."] = { Abilities::REDUCE_MAGIC_DAMAGE };
+    all_abilities["Spell damage reduction 75%."] = { Abilities::REDUCE_MAGIC_DAMAGE };
+    all_abilities["Spell damage reduction 80%."] = { Abilities::REDUCE_MAGIC_DAMAGE };
+    all_abilities["Spell damage reduction 85%."] = { Abilities::REDUCE_MAGIC_DAMAGE };
+    all_abilities["Spell damage reduction 95%."] = { Abilities::REDUCE_MAGIC_DAMAGE };
 
-    all_abilities["Immune to jousting."]                    = { Special_abilities::Abilities::IS_IMMUNE_TO_JOUSTING };
-    all_abilities["Immune to Fear."]                        = { Special_abilities::Abilities::IS_IMMUNE_TO_FEAR     };
-    all_abilities["Immune to Blind."]                       = { Special_abilities::Abilities::IS_IMMUNE_TO_BLIND    };
-    all_abilities["Immune to Petrify."]                     = { Special_abilities::Abilities::IS_IMMUNE_TO_PETRIFY  };
-    all_abilities["Immune to Ice Bolt and Frost Ring."]     = { Special_abilities::Abilities::IS_IMMUNE_TO_ICE_BOLT, Special_abilities::Abilities::IS_IMMUNE_TO_FROST_RING };
-    all_abilities["Immune to Meteor Shower."]               = { Special_abilities::Abilities::IS_IMMUNE_TO_METEOR_SHOWER };
-    all_abilities["Immune to Lightning Bolt, Chain Lightning and Armageddon."] = { Special_abilities::Abilities::IS_IMMUNE_TO_LIGHTNING_BOLT, Special_abilities::Abilities::IS_IMMUNE_TO_CHAIN_LIGHTNING, Special_abilities::Abilities::IS_IMMUNE_TO_ARMAGEDDON };
-    all_abilities["Immune to fire spells (Magic Arrow included)."] = { Special_abilities::Abilities::IS_IMMUNE_TO_FIRE_SPELLS, Special_abilities::Abilities::IS_IMMUNE_TO_MAGIC_ARROW };
-    all_abilities["Immune to mind spells."]                 = { Special_abilities::Abilities::IS_IMMUNE_TO_MIND_SPELLS      };
-    all_abilities["Immune to spells level 1-3."]            = { Special_abilities::Abilities::IS_IMMUNE_TO_SPELLS_LEVEL_1_3 };
-    all_abilities["Immune to spells level 1-4."]            = { Special_abilities::Abilities::IS_IMMUNE_TO_SPELLS_LEVEL_1_4 };
-    all_abilities["Immune to all spells."]                  = { Special_abilities::Abilities::IS_IMMUNE_TO_ALL_SPELLS       };
+    all_abilities["Immune to jousting."]                    = { Abilities::IS_IMMUNE_TO_JOUSTING };
+    all_abilities["Immune to Fear."]                        = { Abilities::IS_IMMUNE_TO_FEAR     };
+    all_abilities["Immune to Blind."]                       = { Abilities::IS_IMMUNE_TO_BLIND    };
+    all_abilities["Immune to Petrify."]                     = { Abilities::IS_IMMUNE_TO_PETRIFY  };
+    all_abilities["Immune to Ice Bolt and Frost Ring."]     = { Abilities::IS_IMMUNE_TO_ICE_BOLT, Abilities::IS_IMMUNE_TO_FROST_RING };
+    all_abilities["Immune to Meteor Shower."]               = { Abilities::IS_IMMUNE_TO_METEOR_SHOWER };
+    all_abilities["Immune to Lightning Bolt, Chain Lightning and Armageddon."] = { Abilities::IS_IMMUNE_TO_LIGHTNING_BOLT, Abilities::IS_IMMUNE_TO_CHAIN_LIGHTNING, Abilities::IS_IMMUNE_TO_ARMAGEDDON };
+    all_abilities["Immune to fire spells (Magic Arrow included)."] = { Abilities::IS_IMMUNE_TO_FIRE_SPELLS, Abilities::IS_IMMUNE_TO_MAGIC_ARROW };
+    all_abilities["Immune to mind spells."]                 = { Abilities::IS_IMMUNE_TO_MIND_SPELLS      };
+    all_abilities["Immune to spells level 1-3."]            = { Abilities::IS_IMMUNE_TO_SPELLS_LEVEL_1_3 };
+    all_abilities["Immune to spells level 1-4."]            = { Abilities::IS_IMMUNE_TO_SPELLS_LEVEL_1_4 };
+    all_abilities["Immune to all spells."]                  = { Abilities::IS_IMMUNE_TO_ALL_SPELLS       };
 
-    all_abilities["Vulnerable to Ice Bolt and Frost Ring."]                        = { Special_abilities::Abilities::IS_VULNERABLE_TO_ICE_BOLT, Special_abilities::Abilities::IS_VULNERABLE_TO_FROST_RING };
-    all_abilities["Vulnerable to Lightning Bolt, Chain Lightning and Armageddon."] = { Special_abilities::Abilities::IS_VULNERABLE_TO_LIGHTNING_BOLT, Special_abilities::Abilities::IS_VULNERABLE_TO_CHAIN_LIGHTNING, Special_abilities::Abilities::IS_VULNERABLE_TO_ARMAGEDDON };
-    all_abilities["Vulnerable to Armageddon, Fireball, Inferno."]                  = { Special_abilities::Abilities::IS_VULNERABLE_TO_ARMAGEDDON, Special_abilities::Abilities::IS_VULNERABLE_TO_FIRE_BALL, Special_abilities::Abilities::IS_VULNERABLE_TO_INFERNO };
-    all_abilities["Vulnerable to Meteor Shower."]                                  = { Special_abilities::Abilities::IS_VULNERABLE_TO_METEOR_SHOWER };
+    all_abilities["Vulnerable to Ice Bolt and Frost Ring."]                        = { Abilities::IS_VULNERABLE_TO_ICE_BOLT, Abilities::IS_VULNERABLE_TO_FROST_RING };
+    all_abilities["Vulnerable to Lightning Bolt, Chain Lightning and Armageddon."] = { Abilities::IS_VULNERABLE_TO_LIGHTNING_BOLT, Abilities::IS_VULNERABLE_TO_CHAIN_LIGHTNING, Abilities::IS_VULNERABLE_TO_ARMAGEDDON };
+    all_abilities["Vulnerable to Armageddon, Fireball, Inferno."]                  = { Abilities::IS_VULNERABLE_TO_ARMAGEDDON, Abilities::IS_VULNERABLE_TO_FIRE_BALL, Abilities::IS_VULNERABLE_TO_INFERNO };
+    all_abilities["Vulnerable to Meteor Shower."]                                  = { Abilities::IS_VULNERABLE_TO_METEOR_SHOWER };
 
-    all_abilities["Minimum morale is +1."] = { Special_abilities::Abilities::MINIMUM_MORALE_1 };
-    all_abilities["Minimum luck is +1."]   = { Special_abilities::Abilities::MINIMUM_LUCK_1   };
+    all_abilities["Minimum morale is +1."] = { Abilities::MINIMUM_MORALE_1 };
+    all_abilities["Minimum luck is +1."]   = { Abilities::MINIMUM_LUCK_1   };
 
-    all_abilities["+1 morale to alias troops."]         = { Special_abilities::Abilities::INCREASES_ALIAS_MORALE_BY_1 };
-    all_abilities["-1 morale to enemy troops."]         = { Special_abilities::Abilities::DECREASES_ENEMY_MORALE_BY_1 };
-    all_abilities["-1 luck to enemy troops."]           = { Special_abilities::Abilities::DECREASES_ENEMY_LUCK_BY_1   };
-    all_abilities["-2 luck to enemy troops."]           = { Special_abilities::Abilities::DECREASES_ENEMY_LUCK_BY_2   };
-    all_abilities["Doubles friendly unit Luck chance."] = { Special_abilities::Abilities::DOUBLES_LUCK_CHANCE      };
+    all_abilities["+1 morale to alias troops."]         = { Abilities::INCREASES_ALIAS_MORALE_BY_1 };
+    all_abilities["-1 morale to enemy troops."]         = { Abilities::DECREASES_ENEMY_MORALE_BY_1 };
+    all_abilities["-1 luck to enemy troops."]           = { Abilities::DECREASES_ENEMY_LUCK_BY_1   };
+    all_abilities["-2 luck to enemy troops."]           = { Abilities::DECREASES_ENEMY_LUCK_BY_2   };
+    all_abilities["Doubles friendly unit Luck chance."] = { Abilities::DOUBLES_LUCK_CHANCE      };
 
-    all_abilities["Magic channel."]                         = { Special_abilities::Abilities::MAGIC_CHANNEL };
-    all_abilities["Magic damper."]                          = { Special_abilities::Abilities::MAGIC_DAMPER  };
-    all_abilities["Hero's combat spells cost 2 less mana."] = { Special_abilities::Abilities::MANA_ECONOMY  };
+    all_abilities["Magic channel."]                         = { Abilities::MAGIC_CHANNEL };
+    all_abilities["Magic damper."]                          = { Abilities::MAGIC_DAMPER  };
+    all_abilities["Hero's combat spells cost 2 less mana."] = { Abilities::MANA_ECONOMY  };
 
-    all_abilities["Spying."]             = { Special_abilities::Abilities::HAS_SPYING         };
-    all_abilities["Sandwalker."]         = { Special_abilities::Abilities::IS_SANDWALKER      };
-    all_abilities["Generates crystals."] = { Special_abilities::Abilities::GENERATES_CRYSTALS };
+    all_abilities["Spying."]             = { Abilities::HAS_SPYING         };
+    all_abilities["Sandwalker."]         = { Abilities::IS_SANDWALKER      };
+    all_abilities["Generates crystals."] = { Abilities::GENERATES_CRYSTALS };
 
     return all_abilities;
 }
@@ -420,7 +421,7 @@ void Creature::special_abilities::set_special_abilities()
     while( helper.length() > 1) // no need to enter helper when an empty space remains
     {
         counter ++;
-        if( counter > Special_abilities::MAX_NUMBER )
+        if( counter > MAX_NUMBER )
         {
             std::cerr << "A creature's special ability is not recognized by the algorithm. Make sure that the string in create_map_of_all_abilities() is the same as in Creature_List." << std::endl;
             std::cerr << "Problematic string : " << helper << std::endl;
@@ -451,37 +452,37 @@ void Creature::special_abilities::set_special_abilities()
         }
     }
 
-    if( get_ability_bit(Special_abilities::Abilities::IGNORE_ENEMY_DEFENSE) )
+    if( get_ability_bit(Abilities::IGNORE_ENEMY_DEFENSE) )
         m_ignore_enemy_defense_by_percent = 40*(m_abilities_str.find("Ignores 40% of enemy's defense skill.") != std::string::npos)
                                           + 80*(m_abilities_str.find("Ignores 80% of enemy's defense skill.") != std::string::npos);
 
-    if( get_ability_bit(Special_abilities::Abilities::IGNORE_ENEMY_ATTACK) )
+    if( get_ability_bit(Abilities::IGNORE_ENEMY_ATTACK) )
         m_ignore_enemy_attack_by_percent = 30*(m_abilities_str.find("Ignores 30% of enemy's attack skill.") != std::string::npos)
                                          + 60*(m_abilities_str.find("Ignores 60% of enemy's attack skill.") != std::string::npos);
 
-    if( get_ability_bit(Special_abilities::Abilities::REDUCE_MAGIC_DAMAGE) )
+    if( get_ability_bit(Abilities::REDUCE_MAGIC_DAMAGE) )
         m_reduce_magic_damage_by_percent = 50*(m_abilities_str.find("Spell damage reduction 50%.") != std::string::npos)
                                          + 75*(m_abilities_str.find("Spell damage reduction 75%.") != std::string::npos)
                                          + 80*(m_abilities_str.find("Spell damage reduction 80%.") != std::string::npos)
                                          + 85*(m_abilities_str.find("Spell damage reduction 85%.") != std::string::npos)
                                          + 95*(m_abilities_str.find("Spell damage reduction 95%.") != std::string::npos);
 
-    if( get_ability_bit(Special_abilities::Abilities::HAS_MAGIC_RESIST) )
+    if( get_ability_bit(Abilities::HAS_MAGIC_RESIST) )
         m_has_magic_resist_by_percent = 20*(m_abilities_str.find("Magic resistance 20%.") != std::string::npos)
                                       + 40*(m_abilities_str.find("Magic resistance 40%.") != std::string::npos);
 
-    if( get_ability_bit(Special_abilities::Abilities::CAN_CAST_RESSURECTION) )     { m_number_of_casts = 1; return;                    } // Archangel
-    if( get_ability_bit(Special_abilities::Abilities::CAN_CAST_ADVANCED_FORTUNE) ) { m_number_of_casts = 3; m_spell_power = 6; return; } // Leprechaun
-    if( get_ability_bit(Special_abilities::Abilities::CAN_CAST_ADVANCED_MIRTH) )   { m_number_of_casts = 3; m_spell_power = 6; return; } // Satyr
+    if( get_ability_bit(Abilities::CAN_CAST_RESSURECTION) )     { m_number_of_casts = 1; return;                    } // Archangel
+    if( get_ability_bit(Abilities::CAN_CAST_ADVANCED_FORTUNE) ) { m_number_of_casts = 3; m_spell_power = 6; return; } // Leprechaun
+    if( get_ability_bit(Abilities::CAN_CAST_ADVANCED_MIRTH) )   { m_number_of_casts = 3; m_spell_power = 6; return; } // Satyr
 
-    if( get_ability_bit(Special_abilities::Abilities::IS_SPELLCASTER) )
+    if( get_ability_bit(Abilities::IS_SPELLCASTER) )
     {
-        if     ( get_ability_bit(Special_abilities::Abilities::HATES_EFREETI) )    { m_number_of_casts = 3; m_spell_power = 6; return; } // Master Genie
-        else if( get_ability_bit(Special_abilities::Abilities::HAS_MAGIC_MIRROR) ) { m_number_of_casts = 5; return;                    } // Faerie Dragon
+        if     ( get_ability_bit(Abilities::HATES_EFREETI) )    { m_number_of_casts = 3; m_spell_power = 6; return; } // Master Genie
+        else if( get_ability_bit(Abilities::HAS_MAGIC_MIRROR) ) { m_number_of_casts = 5; return;                    } // Faerie Dragon
         else                          { m_number_of_casts = 3; m_spell_power = 3; return; } // Enchanter
     }
 
-    if( get_ability_bit(Special_abilities::Abilities::CAN_CAST_BLOODLUST) )        { m_number_of_casts = 3; m_spell_power = 3; return; } // Orge Mage
+    if( get_ability_bit(Abilities::CAN_CAST_BLOODLUST) )        { m_number_of_casts = 3; m_spell_power = 3; return; } // Orge Mage
 }
 
 std::string Creature::get_faction_as_string() const

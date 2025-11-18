@@ -1269,7 +1269,7 @@ void Battle::inflict_damage(Stack* const attacking_stack, Stack* const defending
     // calculate I5 - special ability bonus
     // death blow bonus
     if( attacking_creature->get_may_cast_death_blow() )
-        I5 = ( (rand() % 100) < Special_abilities::Chance_to_cast::DEATH_BLOW ) * PERCENT_100;
+        I5 = ( (rand() % 100) < Chance_to_cast::DEATH_BLOW ) * PERCENT_100;
 
     // hate bonus
     if     ( attacking_creature->get_hates_efreeti()       && ( defending_creature == Creature::get(Efreet) || defending_creature == Creature::get(Efreet_Sultan) ) ) I5 = PERCENT_50;
